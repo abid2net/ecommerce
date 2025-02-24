@@ -24,8 +24,14 @@ class ProductRepository {
 
   Stream<List<ProductModel>> getProducts() {
     return _firestore.collection('products').snapshots().map((snapshot) {
+      print(
+        'Firestore snapshot received: ${snapshot.docs.length} documents',
+      ); // Debug print
       return snapshot.docs.map((doc) {
-        return ProductModel.fromMap(doc.data()..['id'] = doc.id);
+        final data = doc.data();
+        data['id'] = doc.id; // Ensure ID is included
+        print('Processing document: ${doc.id}'); // Debug print
+        return ProductModel.fromMap(data);
       }).toList();
     });
   }

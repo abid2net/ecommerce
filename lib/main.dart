@@ -9,6 +9,8 @@ import 'theme/app_theme.dart';
 import 'blocs/product/product_bloc.dart';
 import 'routes/routes.dart';
 import 'repositories/product_repository.dart';
+import 'blocs/wishlist/wishlist_bloc.dart';
+import 'repositories/wishlist_repository.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,6 +31,9 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create:
               (context) => ProductBloc(productRepository: ProductRepository()),
+        ),
+        BlocProvider(
+          create: (_) => WishlistBloc(wishlistRepository: WishlistRepository()),
         ),
       ],
       child: MaterialApp(

@@ -68,7 +68,10 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       final productsStream = _productRepository.getProducts();
       await emit.forEach(
         productsStream,
-        onData: (List<ProductModel> products) => ProductLoaded(products),
+        onData: (List<ProductModel> products) {
+          print('Loaded ${products.length} products'); // Debug print
+          return ProductLoaded(products);
+        },
         onError: (error, stackTrace) => ProductError(error.toString()),
       );
     } catch (e) {

@@ -34,7 +34,7 @@ class UserModel extends Equatable {
       phone: map['phone'] as String?,
       address: map['address'] as String?,
       role: UserRole.values.firstWhere(
-        (e) => e.toString() == map['role'],
+        (e) => e.name == map['role'],
         orElse: () => UserRole.customer,
       ),
       createdAt:
@@ -56,7 +56,7 @@ class UserModel extends Equatable {
       'photoUrl': photoUrl,
       'phone': phone,
       'address': address,
-      'role': role.toString(),
+      'role': role.name,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
     };
@@ -80,6 +80,8 @@ class UserModel extends Equatable {
       updatedAt: DateTime.now(),
     );
   }
+
+  bool get isAdmin => role == UserRole.admin;
 
   @override
   List<Object?> get props => [

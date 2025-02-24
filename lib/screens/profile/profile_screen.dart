@@ -106,17 +106,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         return Stack(
           children: [
             Scaffold(
-              appBar: AppBar(
-                title: const Text('Profile'),
-                // actions: [
-                //   IconButton(
-                //     icon: const Icon(Icons.logout),
-                //     onPressed: () {
-                //       context.read<AuthBloc>().add(SignOutEvent());
-                //     },
-                //   ),
-                // ],
-              ),
+              appBar: AppBar(title: const Text('Profile')),
               body: SingleChildScrollView(
                 padding: const EdgeInsets.all(16.0),
                 child: Form(
@@ -327,7 +317,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ],
                       const SizedBox(height: 20),
-
                       ElevatedButton(
                         onPressed:
                             () => context.read<AuthBloc>().add(SignOutEvent()),

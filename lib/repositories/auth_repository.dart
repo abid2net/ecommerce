@@ -1,3 +1,4 @@
+import 'package:ecommerce/constants/constants.dart';
 import 'package:ecommerce/models/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -45,7 +46,10 @@ class AuthRepository {
           updatedAt: DateTime.now(),
         );
 
-        await _firestore.collection('users').doc(user.id).set(user.toMap());
+        await _firestore
+            .collection(AppConstants.usersCollection)
+            .doc(user.id)
+            .set(user.toMap());
         return user;
       }
     } catch (e) {
@@ -99,7 +103,10 @@ class AuthRepository {
           updatedAt: DateTime.now(),
         );
 
-        await _firestore.collection('users').doc(user.id).set(user.toMap());
+        await _firestore
+            .collection(AppConstants.usersCollection)
+            .doc(user.id)
+            .set(user.toMap());
         return user;
       }
     } catch (e) {
@@ -134,7 +141,11 @@ class AuthRepository {
 
   Future<UserModel?> getUserData(String userId) async {
     try {
-      final doc = await _firestore.collection('users').doc(userId).get();
+      final doc =
+          await _firestore
+              .collection(AppConstants.usersCollection)
+              .doc(userId)
+              .get();
       if (doc.exists) {
         return UserModel.fromMap(doc.data()!);
       }
@@ -146,7 +157,9 @@ class AuthRepository {
 
   Future<String?> uploadProfilePicture(String userId, File imageFile) async {
     try {
-      final ref = _storage.ref().child('profile_pictures/$userId.jpg');
+      final ref = _storage.ref().child(
+        '${AppConstants.profilePicturePath}/$userId.jpg',
+      );
       await ref.putFile(imageFile);
       final url = await ref.getDownloadURL();
       return url;
@@ -164,7 +177,7 @@ class AuthRepository {
 
       final updatedUser = user.copyWith(photoUrl: photoUrl);
       await _firestore
-          .collection('users')
+          .collection(AppConstants.usersCollection)
           .doc(user.id)
           .update(updatedUser.toMap());
     } catch (e) {

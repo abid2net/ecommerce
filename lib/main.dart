@@ -6,6 +6,9 @@ import 'repositories/auth_repository.dart';
 import 'blocs/auth/auth_bloc.dart';
 import 'controllers/app_controller.dart';
 import 'theme/app_theme.dart';
+import 'blocs/product/product_bloc.dart';
+import 'routes/routes.dart';
+import 'repositories/product_repository.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,17 +21,21 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RepositoryProvider(
-      create: (context) => AuthRepository(),
-      child: BlocProvider(
-        create:
-            (context) =>
-                AuthBloc(authRepository: context.read<AuthRepository>()),
-        child: MaterialApp(
-          title: AppConstants.appName,
-          theme: AppTheme.lightTheme,
-          home: const AppController(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => AuthBloc(authRepository: AuthRepository()),
         ),
+        BlocProvider(
+          create:
+              (context) => ProductBloc(productRepository: ProductRepository()),
+        ),
+      ],
+      child: MaterialApp(
+        title: AppConstants.appName,
+        theme: AppTheme.lightTheme,
+        home: const AppController(),
+        routes: Routes.getRoutes(),
       ),
     );
   }

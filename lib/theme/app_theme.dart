@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 class AppTheme {
   static const double _borderRadius = 12.0;
   static const Color primaryColor = Colors.lightBlue;
-  static const Color secondaryColor = Color(0xFFE57373); // light maroon
+  static const Color secondaryColor = Color(0xFF2f6d80); // light maroon
+  static const Color tertiaryColor = Color(0xFF6aa4b0); // light maroon
 
   static ThemeData lightTheme = ThemeData(
     useMaterial3: true,

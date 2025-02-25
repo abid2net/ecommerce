@@ -6,6 +6,7 @@ import 'package:ecommerce/models/category_model.dart';
 import 'package:ecommerce/models/product_model.dart';
 import 'package:ecommerce/screens/product/product_details_screen.dart';
 import 'package:ecommerce/screens/wishlist/wishlist_screen.dart';
+import 'package:ecommerce/widgets/rating_bar.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -147,61 +148,61 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildCategoryList() {
-    return SliverToBoxAdapter(
-      child: SizedBox(
-        height: 120,
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.all(8.0),
-          itemCount: ProductCategory.values.length,
-          itemBuilder: (context, index) {
-            final category = ProductCategory.values[index];
-            final isSelected = category == _selectedCategory;
+  // Widget _buildCategoryList() {
+  //   return SliverToBoxAdapter(
+  //     child: SizedBox(
+  //       height: 120,
+  //       child: ListView.builder(
+  //         scrollDirection: Axis.horizontal,
+  //         padding: const EdgeInsets.all(8.0),
+  //         itemCount: ProductCategory.values.length,
+  //         itemBuilder: (context, index) {
+  //           final category = ProductCategory.values[index];
+  //           final isSelected = category == _selectedCategory;
 
-            return Card(
-              color:
-                  isSelected
-                      ? Theme.of(context).colorScheme.primaryContainer
-                      : null,
-              child: InkWell(
-                onTap: () => setState(() => _selectedCategory = category),
-                child: Container(
-                  width: 100,
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        category.categoryIcon,
-                        size: 32,
-                        color:
-                            isSelected
-                                ? Theme.of(context).colorScheme.primary
-                                : null,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        category.displayName,
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color:
-                              isSelected
-                                  ? Theme.of(context).colorScheme.primary
-                                  : null,
-                          fontWeight: isSelected ? FontWeight.bold : null,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
-        ),
-      ),
-    );
-  }
+  //           return Card(
+  //             color:
+  //                 isSelected
+  //                     ? Theme.of(context).colorScheme.primaryContainer
+  //                     : null,
+  //             child: InkWell(
+  //               onTap: () => setState(() => _selectedCategory = category),
+  //               child: Container(
+  //                 width: 100,
+  //                 padding: const EdgeInsets.all(8.0),
+  //                 child: Column(
+  //                   mainAxisAlignment: MainAxisAlignment.center,
+  //                   children: [
+  //                     Icon(
+  //                       category.categoryIcon,
+  //                       size: 32,
+  //                       color:
+  //                           isSelected
+  //                               ? Theme.of(context).colorScheme.primary
+  //                               : null,
+  //                     ),
+  //                     const SizedBox(height: 8),
+  //                     Text(
+  //                       category.displayName,
+  //                       textAlign: TextAlign.center,
+  //                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
+  //                         color:
+  //                             isSelected
+  //                                 ? Theme.of(context).colorScheme.primary
+  //                                 : null,
+  //                         fontWeight: isSelected ? FontWeight.bold : null,
+  //                       ),
+  //                     ),
+  //                   ],
+  //                 ),
+  //               ),
+  //             ),
+  //           );
+  //         },
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _buildProductCard(ProductModel product) {
     return Card(
@@ -239,9 +240,22 @@ class _HomeScreenState extends State<HomeScreen> {
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      RatingBar(rating: product.rating, size: 14),
+                      const SizedBox(width: 4),
+                      Text(
+                        '(${product.reviewCount})',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
                   Text(
                     '\$${product.price.toStringAsFixed(2)}',
-                    style: Theme.of(context).textTheme.bodyMedium,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),

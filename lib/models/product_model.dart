@@ -9,6 +9,8 @@ class ProductModel extends Equatable {
   final List<String> images;
   final ProductCategory category;
   final int? quantity;
+  final double rating;
+  final int reviewCount;
 
   const ProductModel({
     required this.id,
@@ -18,6 +20,8 @@ class ProductModel extends Equatable {
     this.images = const [],
     required this.category,
     this.quantity,
+    this.rating = 0.0,
+    this.reviewCount = 0,
   });
 
   @override
@@ -29,6 +33,8 @@ class ProductModel extends Equatable {
     images,
     category,
     quantity,
+    rating,
+    reviewCount,
   ];
 
   Map<String, dynamic> toMap() {
@@ -40,6 +46,8 @@ class ProductModel extends Equatable {
       'images': images,
       'category': category.name,
       'quantity': quantity,
+      'rating': rating,
+      'reviewCount': reviewCount,
     };
   }
 
@@ -55,6 +63,8 @@ class ProductModel extends Equatable {
         orElse: () => ProductCategory.tyres,
       ),
       quantity: map['quantity'] as int?,
+      rating: (map['rating'] as num?)?.toDouble() ?? 0.0,
+      reviewCount: (map['reviewCount'] as int?) ?? 0,
     );
   }
 }

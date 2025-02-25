@@ -1,11 +1,17 @@
 import 'package:ecommerce/screens/payment/payment_screen.dart';
-import 'package:flutter/material.dart' hide CarouselController;
+import 'package:ecommerce/theme/app_theme.dart';
+import 'package:ecommerce/widgets/rating_bar.dart';
+import 'package:ecommerce/widgets/review_dialog.dart';
+import 'package:flutter/material.dart';
 import 'package:ecommerce/models/product_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ecommerce/blocs/wishlist/wishlist_bloc.dart';
 import 'package:ecommerce/blocs/cart/cart_bloc.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dots_indicator/dots_indicator.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ecommerce/models/review_model.dart';
+import 'package:ecommerce/widgets/review_card.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   final ProductModel product;
@@ -109,9 +115,27 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    '\$${widget.product.price.toStringAsFixed(2)}',
-                    style: Theme.of(context).textTheme.headlineSmall,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        '\$${widget.product.price.toStringAsFixed(2)}',
+                        style: Theme.of(context).textTheme.headlineSmall,
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          RatingBar(rating: widget.product.rating, size: 20),
+                          const SizedBox(height: 4),
+                          Text(
+                            '${widget.product.rating.toStringAsFixed(1)} (${widget.product.reviewCount} reviews)',
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(color: Colors.grey[600]),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 8),
                   Text(
@@ -128,11 +152,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     widget.product.description ?? 'No description available',
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 25),
 
                   Center(
                     child: SizedBox(
-                      width: 200,
+                      width: MediaQuery.of(context).size.width / 1.3,
                       child: ElevatedButton(
                         onPressed:
                             () => _showQuantityDialog(context, isBuyNow: false),
@@ -143,13 +167,72 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   const SizedBox(height: 16),
                   Center(
                     child: SizedBox(
-                      width: 200,
+                      width: MediaQuery.of(context).size.width / 1.3,
                       child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.tertiaryColor,
+                        ),
                         onPressed:
                             () => _showQuantityDialog(context, isBuyNow: true),
                         child: const Text('Buy now'),
                       ),
                     ),
+                  ),
+                  const SizedBox(height: 32),
+                  // Reviews Section
+                  Text(
+                    'Customer Reviews',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  const SizedBox(height: 8),
+                  // Add Review Button
+                  Center(
+                    child: OutlinedButton.icon(
+                      onPressed: () => _showReviewDialog(context),
+                      icon: const Icon(Icons.rate_review),
+                      label: const Text('Write a Review'),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  StreamBuilder<List<ReviewModel>>(
+                    stream: FirebaseFirestore.instance
+                        .collection('products')
+                        .doc(widget.product.id)
+                        .collection('reviews')
+                        .orderBy('createdAt', descending: true)
+                        .snapshots()
+                        .map(
+                          (snapshot) =>
+                              snapshot.docs
+                                  .map((doc) => ReviewModel.fromMap(doc.data()))
+                                  .toList(),
+                        ),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError) {
+                        return Center(child: Text('Error: ${snapshot.error}'));
+                      }
+
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+
+                      final reviews = snapshot.data ?? [];
+
+                      if (reviews.isEmpty) {
+                        return const Center(child: Text('No reviews yet'));
+                      }
+
+                      return ListView.separated(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: reviews.length,
+                        separatorBuilder: (context, index) => const Divider(),
+                        itemBuilder: (context, index) {
+                          final review = reviews[index];
+                          return ReviewCard(review: review);
+                        },
+                      );
+                    },
                   ),
                 ],
               ),
@@ -234,6 +317,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           },
         );
       },
+    );
+  }
+
+  Future<void> _showReviewDialog(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (context) => ReviewDialog(productId: widget.product.id),
     );
   }
 }

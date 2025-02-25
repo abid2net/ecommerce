@@ -2,6 +2,7 @@ import 'package:ecommerce/models/product_model.dart';
 import 'package:ecommerce/screens/home/home_screen.dart';
 import 'package:ecommerce/screens/product/product_management_screen.dart';
 import 'package:ecommerce/screens/product/product_form_screen.dart';
+import 'package:ecommerce/screens/category/category_management_screen.dart';
 import 'package:flutter/material.dart';
 
 class Routes {
@@ -9,8 +10,9 @@ class Routes {
   static const String productManagement = '/products';
   static const String productAdd = '/products/add';
   static const String productEdit = '/products/edit';
+  static const String categoryManagement = '/categories';
 
-  static Map<String, WidgetBuilder> getRoutes() {
+  static Map<String, Widget Function(BuildContext)> getRoutes() {
     return {
       home: (context) => const HomeScreen(),
       productManagement: (context) => const ProductManagementScreen(),
@@ -20,6 +22,7 @@ class Routes {
             ModalRoute.of(context)!.settings.arguments as ProductModel;
         return ProductFormScreen(isEditing: true, product: product);
       },
+      categoryManagement: (context) => const CategoryManagementScreen(),
     };
   }
 }

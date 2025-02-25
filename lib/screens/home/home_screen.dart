@@ -7,6 +7,7 @@ import 'package:ecommerce/models/product_model.dart';
 import 'package:ecommerce/screens/product/product_details_screen.dart';
 import 'package:ecommerce/screens/wishlist/wishlist_screen.dart';
 import 'package:ecommerce/widgets/rating_bar.dart';
+import 'package:ecommerce/blocs/category/category_bloc.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -17,7 +18,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final String _searchQuery = '';
-  ProductCategory? _selectedCategory;
+  CategoryModel? _selectedCategory;
   RangeValues _priceRange = const RangeValues(0, 0);
   RangeValues _originlPriceRange = const RangeValues(0, 0);
 
@@ -25,6 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     context.read<ProductBloc>().add(LoadProducts());
+    context.read<CategoryBloc>().add(LoadCategories());
   }
 
   void _updatePriceRange(List<ProductModel> products) {
@@ -120,23 +122,31 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Row(
         children: [
           Expanded(
-            child: DropdownButton<ProductCategory>(
-              value: _selectedCategory,
-              hint: const Text('All Categories'),
-              isExpanded: true,
-              items: [
-                const DropdownMenuItem(
-                  value: null,
-                  child: Text('All Categories'),
-                ),
-                ...ProductCategory.values.map((category) {
-                  return DropdownMenuItem(
-                    value: category,
-                    child: Text(category.displayName),
+            child: BlocBuilder<CategoryBloc, CategoryState>(
+              builder: (context, state) {
+                if (state is CategoryLoaded) {
+                  return DropdownButton<CategoryModel>(
+                    value: _selectedCategory,
+                    hint: const Text('All Categories'),
+                    isExpanded: true,
+                    items: [
+                      const DropdownMenuItem(
+                        value: null,
+                        child: Text('All Categories'),
+                      ),
+                      ...state.categories.map((category) {
+                        return DropdownMenuItem(
+                          value: category,
+                          child: Text(category.displayName),
+                        );
+                      }),
+                    ],
+                    onChanged:
+                        (value) => setState(() => _selectedCategory = value),
                   );
-                }),
-              ],
-              onChanged: (value) => setState(() => _selectedCategory = value),
+                }
+                return const CircularProgressIndicator();
+              },
             ),
           ),
           IconButton(
@@ -272,7 +282,8 @@ class _HomeScreenState extends State<HomeScreen> {
           _searchQuery.isEmpty ||
           product.name.toLowerCase().contains(_searchQuery.toLowerCase());
       final matchesCategory =
-          _selectedCategory == null || product.category == _selectedCategory;
+          _selectedCategory == null ||
+          product.category.id == _selectedCategory?.id;
       final matchesPrice =
           product.price >= _priceRange.start &&
           product.price <= _priceRange.end;

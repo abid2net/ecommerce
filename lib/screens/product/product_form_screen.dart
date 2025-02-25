@@ -3,6 +3,7 @@ import 'package:ecommerce/models/product_model.dart';
 import 'package:ecommerce/blocs/product/product_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ecommerce/models/category_model.dart';
+import 'package:ecommerce/blocs/category/category_bloc.dart';
 
 class ProductFormScreen extends StatefulWidget {
   final bool isEditing;
@@ -20,7 +21,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   late TextEditingController _descriptionController;
   late TextEditingController _priceController;
   final List<TextEditingController> _imageUrlControllers = [];
-  late ProductCategory _selectedCategory;
+  CategoryModel? _selectedCategory;
 
   @override
   void initState() {
@@ -33,7 +34,6 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       text: widget.product?.price.toString(),
     );
 
-    // Initialize image controllers with existing images or one empty controller
     if (widget.product?.images.isNotEmpty == true) {
       for (var imageUrl in widget.product!.images) {
         _imageUrlControllers.add(TextEditingController(text: imageUrl));
@@ -42,7 +42,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       _imageUrlControllers.add(TextEditingController());
     }
 
-    _selectedCategory = widget.product?.category ?? ProductCategory.tyres;
+    context.read<CategoryBloc>().add(LoadCategories());
   }
 
   void _addImageField() {
@@ -124,23 +124,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                     ),
                   ),
                 const SizedBox(height: 16),
-                DropdownButtonFormField<ProductCategory>(
-                  value: _selectedCategory,
-                  decoration: const InputDecoration(labelText: 'Category'),
-                  items:
-                      ProductCategory.values.map((category) {
-                        return DropdownMenuItem(
-                          value: category,
-                          child: Text(category.displayName),
-                        );
-                      }).toList(),
-                  onChanged: (value) {
-                    if (value != null) {
-                      setState(() => _selectedCategory = value);
-                    }
-                  },
-                  validator: (value) => value == null ? 'Required' : null,
-                ),
+                _buildCategoryDropdown(),
                 const SizedBox(height: 32),
                 ElevatedButton(
                   onPressed: _submitForm,
@@ -151,6 +135,68 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildCategoryDropdown() {
+    return BlocBuilder<CategoryBloc, CategoryState>(
+      builder: (context, state) {
+        if (state is CategoryLoaded) {
+          if (!mounted) return const CircularProgressIndicator();
+
+          // Create default tyre category
+          final defaultCategory = CategoryModel(
+            id: 'tyres',
+            name: 'tyres',
+            displayName: 'Tyres',
+            icon: Icons.tire_repair,
+          );
+
+          // Initialize selected category
+          if (_selectedCategory == null) {
+            if (widget.product != null) {
+              _selectedCategory = widget.product!.category;
+            } else if (state.categories.isNotEmpty) {
+              // Try to find tyres category or use first available
+              _selectedCategory = state.categories.firstWhere(
+                (cat) => cat.name.toLowerCase() == 'tyres',
+                orElse: () => state.categories.first,
+              );
+            } else {
+              // If no categories exist, use default
+              _selectedCategory = defaultCategory;
+            }
+          }
+
+          // Get available categories
+          final categories =
+              state.categories.isEmpty ? [defaultCategory] : state.categories;
+
+          // Ensure selected category is in the list
+          if (!categories.any((cat) => cat.id == _selectedCategory!.id)) {
+            _selectedCategory = categories.first;
+          }
+
+          return DropdownButtonFormField<CategoryModel>(
+            value: _selectedCategory,
+            decoration: const InputDecoration(labelText: 'Category'),
+            items:
+                categories.map((category) {
+                  return DropdownMenuItem(
+                    value: category,
+                    child: Text(category.displayName),
+                  );
+                }).toList(),
+            onChanged: (value) {
+              if (value != null) {
+                setState(() => _selectedCategory = value);
+              }
+            },
+            validator: (value) => value == null ? 'Required' : null,
+          );
+        }
+        return const CircularProgressIndicator();
+      },
     );
   }
 
@@ -170,7 +216,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
               .map((controller) => controller.text)
               .where((url) => url.isNotEmpty)
               .toList(),
-      category: _selectedCategory,
+      category: _selectedCategory!,
     );
 
     if (widget.isEditing) {

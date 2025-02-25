@@ -58,13 +58,25 @@ class _ProductListViewState extends State<ProductListView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Product Management'),
+        title: const Text('Manage Products'),
         actions: [
+          PopupMenuButton(
+            itemBuilder:
+                (context) => [
+                  const PopupMenuItem(
+                    value: 'categories',
+                    child: Text('Manage Categories'),
+                  ),
+                ],
+            onSelected: (value) {
+              if (value == 'categories') {
+                Navigator.pushNamed(context, '/categories');
+              }
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.add),
-            onPressed: () {
-              Navigator.pushNamed(context, '/products/add');
-            },
+            onPressed: () => _navigateToProductForm(context),
           ),
         ],
       ),
@@ -129,5 +141,9 @@ class _ProductListViewState extends State<ProductListView> {
         );
       },
     );
+  }
+
+  void _navigateToProductForm(BuildContext context) {
+    Navigator.pushNamed(context, '/products/add');
   }
 }

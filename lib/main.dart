@@ -15,6 +15,8 @@ import 'blocs/cart/cart_bloc.dart';
 import 'repositories/cart_repository.dart';
 import 'blocs/order/order_bloc.dart';
 import 'repositories/order_repository.dart';
+import 'repositories/category_repository.dart';
+import 'blocs/category/category_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,6 +46,9 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider(
           create: (_) => OrderBloc(orderRepository: OrderRepository()),
+        ),
+        BlocProvider(
+          create: (_) => CategoryBloc(categoryRepository: CategoryRepository()),
         ),
       ],
       child: MaterialApp(

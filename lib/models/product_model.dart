@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:ecommerce/models/category_model.dart';
+import 'package:flutter/material.dart';
 
 class ProductModel extends Equatable {
   final String id;
@@ -7,7 +8,7 @@ class ProductModel extends Equatable {
   final String? description;
   final double price;
   final List<String> images;
-  final ProductCategory category;
+  final CategoryModel category;
   final int? quantity;
   final double rating;
   final int reviewCount;
@@ -44,7 +45,7 @@ class ProductModel extends Equatable {
       'description': description,
       'price': price,
       'images': images,
-      'category': category.name,
+      'category': category.toMap(),
       'quantity': quantity,
       'rating': rating,
       'reviewCount': reviewCount,
@@ -58,10 +59,15 @@ class ProductModel extends Equatable {
       description: map['description'] as String?,
       price: (map['price'] as num).toDouble(),
       images: List<String>.from(map['images'] ?? []),
-      category: ProductCategory.values.firstWhere(
-        (e) => e.name == map['category'],
-        orElse: () => ProductCategory.tyres,
-      ),
+      category:
+          map['category'] is String
+              ? CategoryModel(
+                id: '',
+                name: map['category'],
+                displayName: map['category'],
+                icon: Icons.info,
+              )
+              : CategoryModel.fromMap(map['category'] as Map<String, dynamic>),
       quantity: map['quantity'] as int?,
       rating: (map['rating'] as num?)?.toDouble() ?? 0.0,
       reviewCount: (map['reviewCount'] as int?) ?? 0,

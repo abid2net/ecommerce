@@ -19,7 +19,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   late TextEditingController _nameController;
   late TextEditingController _descriptionController;
   late TextEditingController _priceController;
-  late TextEditingController _imageUrlController;
+  final List<TextEditingController> _imageUrlControllers = [];
   late ProductCategory _selectedCategory;
 
   @override
@@ -32,8 +32,30 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     _priceController = TextEditingController(
       text: widget.product?.price.toString(),
     );
-    _imageUrlController = TextEditingController(text: widget.product?.imageUrl);
+
+    // Initialize image controllers with existing images or one empty controller
+    if (widget.product?.images.isNotEmpty == true) {
+      for (var imageUrl in widget.product!.images) {
+        _imageUrlControllers.add(TextEditingController(text: imageUrl));
+      }
+    } else {
+      _imageUrlControllers.add(TextEditingController());
+    }
+
     _selectedCategory = widget.product?.category ?? ProductCategory.tyres;
+  }
+
+  void _addImageField() {
+    setState(() {
+      _imageUrlControllers.add(TextEditingController());
+    });
+  }
+
+  void _removeImageField(int index) {
+    setState(() {
+      _imageUrlControllers[index].dispose();
+      _imageUrlControllers.removeAt(index);
+    });
   }
 
   @override
@@ -42,71 +64,91 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       appBar: AppBar(
         title: Text(widget.isEditing ? 'Edit Product' : 'Add Product'),
       ),
-      body: Form(
-        key: _formKey,
-        child: ListView(
+      body: SingleChildScrollView(
+        child: Padding(
           padding: const EdgeInsets.all(16),
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 5.0),
-              child: TextFormField(
-                controller: _nameController,
-                decoration: const InputDecoration(labelText: 'Name'),
-                validator:
-                    (value) => value?.isEmpty ?? true ? 'Required' : null,
-              ),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                TextFormField(
+                  controller: _nameController,
+                  decoration: const InputDecoration(labelText: 'Name'),
+                  validator:
+                      (value) => value?.isEmpty ?? true ? 'Required' : null,
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _descriptionController,
+                  decoration: const InputDecoration(labelText: 'Description'),
+                  maxLines: 3,
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _priceController,
+                  decoration: const InputDecoration(labelText: 'Price'),
+                  keyboardType: TextInputType.number,
+                  validator:
+                      (value) => value?.isEmpty ?? true ? 'Required' : null,
+                ),
+                const SizedBox(height: 24),
+                const Text('Product Images'),
+                const SizedBox(height: 8),
+                // Image URL fields
+                ...List.generate(_imageUrlControllers.length, (index) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: TextFormField(
+                      controller: _imageUrlControllers[index],
+                      decoration: InputDecoration(
+                        labelText: 'Image URL ${index + 1}',
+                        suffixIcon:
+                            index > 0
+                                ? IconButton(
+                                  icon: const Icon(Icons.remove_circle_outline),
+                                  onPressed: () => _removeImageField(index),
+                                )
+                                : null,
+                      ),
+                    ),
+                  );
+                }),
+                if (_imageUrlControllers.length < 10)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0, bottom: 16.0),
+                    child: ElevatedButton.icon(
+                      onPressed: _addImageField,
+                      icon: const Icon(Icons.add_photo_alternate),
+                      label: const Text('Add Another Image URL'),
+                    ),
+                  ),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<ProductCategory>(
+                  value: _selectedCategory,
+                  decoration: const InputDecoration(labelText: 'Category'),
+                  items:
+                      ProductCategory.values.map((category) {
+                        return DropdownMenuItem(
+                          value: category,
+                          child: Text(category.displayName),
+                        );
+                      }).toList(),
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() => _selectedCategory = value);
+                    }
+                  },
+                  validator: (value) => value == null ? 'Required' : null,
+                ),
+                const SizedBox(height: 32),
+                ElevatedButton(
+                  onPressed: _submitForm,
+                  child: Text(widget.isEditing ? 'Update' : 'Add'),
+                ),
+              ],
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: TextFormField(
-                controller: _descriptionController,
-                decoration: const InputDecoration(labelText: 'Description'),
-                maxLines: 3,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: TextFormField(
-                controller: _priceController,
-                decoration: const InputDecoration(labelText: 'Price'),
-                keyboardType: TextInputType.number,
-                validator:
-                    (value) => value?.isEmpty ?? true ? 'Required' : null,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: TextFormField(
-                controller: _imageUrlController,
-                decoration: const InputDecoration(labelText: 'Image URL'),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: DropdownButtonFormField<ProductCategory>(
-                value: _selectedCategory,
-                decoration: const InputDecoration(labelText: 'Category'),
-                items:
-                    ProductCategory.values.map((category) {
-                      return DropdownMenuItem(
-                        value: category,
-                        child: Text(category.displayName),
-                      );
-                    }).toList(),
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() => _selectedCategory = value);
-                  }
-                },
-                validator: (value) => value == null ? 'Required' : null,
-              ),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _submitForm,
-              child: Text(widget.isEditing ? 'Update' : 'Add'),
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -117,12 +159,17 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
     final product = ProductModel(
       id:
-          widget.product?.id ??
-          DateTime.now().millisecondsSinceEpoch.toString(),
+          widget.isEditing
+              ? widget.product!.id
+              : DateTime.now().microsecondsSinceEpoch.toString(),
       name: _nameController.text,
       description: _descriptionController.text,
       price: double.parse(_priceController.text),
-      imageUrl: _imageUrlController.text,
+      images:
+          _imageUrlControllers
+              .map((controller) => controller.text)
+              .where((url) => url.isNotEmpty)
+              .toList(),
       category: _selectedCategory,
     );
 
@@ -140,7 +187,9 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     _nameController.dispose();
     _descriptionController.dispose();
     _priceController.dispose();
-    _imageUrlController.dispose();
+    for (var controller in _imageUrlControllers) {
+      controller.dispose();
+    }
     super.dispose();
   }
 }

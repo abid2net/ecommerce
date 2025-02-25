@@ -80,7 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   final filteredProducts = _filterProducts(state.products);
                   return CustomScrollView(
                     slivers: [
-                      _buildCategoryList(),
+                      // _buildCategoryList(),
                       SliverPadding(
                         padding: const EdgeInsets.all(8.0),
                         sliver: SliverGrid(
@@ -219,13 +219,13 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Expanded(
               child:
-                  product.imageUrl != null
+                  product.images.isNotEmpty
                       ? Image.network(
-                        product.imageUrl!,
+                        product.images.first,
                         fit: BoxFit.cover,
                         width: double.infinity,
                       )
-                      : const Center(child: Icon(Icons.image)),
+                      : const Icon(Icons.image, size: 100),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),

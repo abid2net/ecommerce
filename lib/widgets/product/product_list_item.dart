@@ -45,12 +45,12 @@ class ProductListItem extends StatelessWidget {
   }
 
   Widget _buildProductImage() {
-    if (product.imageUrl == null || product.imageUrl!.isEmpty) {
+    if (product.images.isEmpty) {
       return const Icon(Icons.image, size: 50);
     }
 
     return Image.network(
-      product.imageUrl!,
+      product.images.first,
       width: 50,
       height: 50,
       fit: BoxFit.cover,

@@ -11,6 +11,10 @@ import 'routes/routes.dart';
 import 'repositories/product_repository.dart';
 import 'blocs/wishlist/wishlist_bloc.dart';
 import 'repositories/wishlist_repository.dart';
+import 'blocs/cart/cart_bloc.dart';
+import 'repositories/cart_repository.dart';
+import 'blocs/order/order_bloc.dart';
+import 'repositories/order_repository.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,6 +38,10 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider(
           create: (_) => WishlistBloc(wishlistRepository: WishlistRepository()),
+        ),
+        BlocProvider(create: (_) => CartBloc(cartRepository: CartRepository())),
+        BlocProvider(
+          create: (_) => OrderBloc(orderRepository: OrderRepository()),
         ),
       ],
       child: MaterialApp(

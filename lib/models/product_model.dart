@@ -6,20 +6,30 @@ class ProductModel extends Equatable {
   final String name;
   final String? description;
   final double price;
-  final String? imageUrl;
+  final List<String> images;
   final ProductCategory category;
+  final int? quantity;
 
   const ProductModel({
     required this.id,
     required this.name,
     this.description,
     required this.price,
-    this.imageUrl,
+    this.images = const [],
     required this.category,
+    this.quantity,
   });
 
   @override
-  List<Object?> get props => [id, name, description, price, imageUrl, category];
+  List<Object?> get props => [
+    id,
+    name,
+    description,
+    price,
+    images,
+    category,
+    quantity,
+  ];
 
   Map<String, dynamic> toMap() {
     return {
@@ -27,8 +37,9 @@ class ProductModel extends Equatable {
       'name': name,
       'description': description,
       'price': price,
-      'imageUrl': imageUrl,
+      'images': images,
       'category': category.name,
+      'quantity': quantity,
     };
   }
 
@@ -38,11 +49,12 @@ class ProductModel extends Equatable {
       name: map['name'] as String,
       description: map['description'] as String?,
       price: (map['price'] as num).toDouble(),
-      imageUrl: map['imageUrl'] as String?,
+      images: List<String>.from(map['images'] ?? []),
       category: ProductCategory.values.firstWhere(
         (e) => e.name == map['category'],
         orElse: () => ProductCategory.tyres,
       ),
+      quantity: map['quantity'] as int?,
     );
   }
 }

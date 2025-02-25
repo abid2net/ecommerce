@@ -54,14 +54,17 @@ class ProductSearchDelegate extends SearchDelegate {
               final product = filteredProducts[index];
               return ListTile(
                 leading:
-                    product.imageUrl != null
+                    product.images.isNotEmpty
                         ? Image.network(
-                          product.imageUrl!,
+                          product.images.first,
                           width: 50,
                           height: 50,
                           fit: BoxFit.cover,
+                          errorBuilder:
+                              (context, error, stackTrace) =>
+                                  const Icon(Icons.image, size: 50),
                         )
-                        : const Icon(Icons.image),
+                        : const Icon(Icons.image, size: 50),
                 title: Text(product.name),
                 subtitle: Text('\$${product.price.toStringAsFixed(2)}'),
                 onTap: () {

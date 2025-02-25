@@ -39,7 +39,9 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create: (_) => WishlistBloc(wishlistRepository: WishlistRepository()),
         ),
-        BlocProvider(create: (_) => CartBloc(cartRepository: CartRepository())),
+        BlocProvider(
+          create: (context) => CartBloc(cartRepository: CartRepository()),
+        ),
         BlocProvider(
           create: (_) => OrderBloc(orderRepository: OrderRepository()),
         ),

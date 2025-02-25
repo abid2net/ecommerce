@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:equatable/equatable.dart';
 import 'package:ecommerce/models/product_model.dart';
 import 'package:ecommerce/repositories/cart_repository.dart';
 import 'package:firebase_auth/firebase_auth.dart';

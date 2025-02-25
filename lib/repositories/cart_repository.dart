@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ecommerce/common/common.dart';
 import 'package:ecommerce/models/product_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -11,9 +12,9 @@ class CartRepository {
     if (userId == null) return Stream.value([]);
 
     return _firestore
-        .collection('users')
+        .collection(FirebaseConstants.users)
         .doc(userId)
-        .collection('cart')
+        .collection(FirebaseConstants.cart)
         .snapshots()
         .map(
           (snapshot) =>
@@ -30,9 +31,9 @@ class CartRepository {
     final cartItem = {...product.toMap(), 'quantity': quantity};
 
     await _firestore
-        .collection('users')
+        .collection(FirebaseConstants.users)
         .doc(userId)
-        .collection('cart')
+        .collection(FirebaseConstants.cart)
         .doc(product.id)
         .set(cartItem);
   }
@@ -42,9 +43,9 @@ class CartRepository {
     if (userId == null) return;
 
     await _firestore
-        .collection('users')
+        .collection(FirebaseConstants.users)
         .doc(userId)
-        .collection('cart')
+        .collection(FirebaseConstants.cart)
         .doc(productId)
         .delete();
   }

@@ -1,3 +1,4 @@
+import 'package:ecommerce/common/common.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -102,13 +103,13 @@ class _ReviewDialogState extends State<ReviewDialog> {
 
     try {
       await FirebaseFirestore.instance
-          .collection('products')
+          .collection(FirebaseConstants.products)
           .doc(widget.productId)
-          .collection('reviews')
+          .collection(FirebaseConstants.reviews)
           .doc(review.id)
           .set(review.toMap());
 
-      if (context.mounted) {
+      if (mounted) {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -118,7 +119,7 @@ class _ReviewDialogState extends State<ReviewDialog> {
         );
       }
     } catch (e) {
-      if (context.mounted) {
+      if (mounted) {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

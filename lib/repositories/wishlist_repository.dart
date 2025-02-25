@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ecommerce/common/common.dart';
 import 'package:ecommerce/models/product_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -11,9 +12,9 @@ class WishlistRepository {
     if (userId == null) return Stream.value([]);
 
     return _firestore
-        .collection('users')
+        .collection(FirebaseConstants.users)
         .doc(userId)
-        .collection('wishlist')
+        .collection(FirebaseConstants.wishlist)
         .snapshots()
         .map(
           (snapshot) =>
@@ -28,9 +29,9 @@ class WishlistRepository {
     if (userId == null) return;
 
     await _firestore
-        .collection('users')
+        .collection(FirebaseConstants.users)
         .doc(userId)
-        .collection('wishlist')
+        .collection(FirebaseConstants.wishlist)
         .doc(product.id)
         .set(product.toMap());
   }
@@ -40,9 +41,9 @@ class WishlistRepository {
     if (userId == null) return;
 
     await _firestore
-        .collection('users')
+        .collection(FirebaseConstants.users)
         .doc(userId)
-        .collection('wishlist')
+        .collection(FirebaseConstants.wishlist)
         .doc(productId)
         .delete();
   }

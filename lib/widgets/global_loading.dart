@@ -1,6 +1,6 @@
+import 'package:ecommerce/common/constants/app_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_indicator/loading_indicator.dart';
-import 'package:ecommerce/constants/constants.dart';
 
 class GlobalLoading extends StatelessWidget {
   const GlobalLoading({super.key});
@@ -10,9 +10,9 @@ class GlobalLoading extends StatelessWidget {
     return Scaffold(
       body: Container(
         color: Colors.black.withAlpha(10),
-        child: const Center(
+        child: Center(
           child: Padding(
-            padding: EdgeInsets.all(AppConstants.defaultPadding),
+            padding: const EdgeInsets.all(AppConstants.defaultPadding),
             child: SizedBox(
               height: 70,
               width: 70,

@@ -1,3 +1,4 @@
+import 'package:ecommerce/common/common.dart';
 import 'package:ecommerce/models/product_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ecommerce/repositories/product_repository.dart';
@@ -69,7 +70,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       await emit.forEach(
         productsStream,
         onData: (List<ProductModel> products) {
-          print('Loaded ${products.length} products'); // Debug print
+          debugLog('Loaded ${products.length} products'); // Debug print
           return ProductLoaded(products);
         },
         onError: (error, stackTrace) => ProductError(error.toString()),

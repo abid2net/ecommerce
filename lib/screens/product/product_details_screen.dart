@@ -1,3 +1,4 @@
+import 'package:ecommerce/common/common.dart';
 import 'package:ecommerce/screens/payment/payment_screen.dart';
 import 'package:ecommerce/theme/app_theme.dart';
 import 'package:ecommerce/widgets/rating_bar.dart';
@@ -196,10 +197,10 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   const SizedBox(height: 16),
                   StreamBuilder<List<ReviewModel>>(
                     stream: FirebaseFirestore.instance
-                        .collection('products')
+                        .collection(FirebaseConstants.products)
                         .doc(widget.product.id)
-                        .collection('reviews')
-                        .orderBy('createdAt', descending: true)
+                        .collection(FirebaseConstants.reviews)
+                        .orderBy(FirebaseConstants.createdAt, descending: true)
                         .snapshots()
                         .map(
                           (snapshot) =>

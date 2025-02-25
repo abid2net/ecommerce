@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ecommerce/common/constants/firebase_constants.dart';
 import 'package:ecommerce/models/category_model.dart';
 import 'package:flutter/material.dart';
 
@@ -7,11 +8,13 @@ class CategoryRepository {
   final CollectionReference _categoriesRef;
 
   CategoryRepository()
-    : _categoriesRef = FirebaseFirestore.instance.collection('categories');
+    : _categoriesRef = FirebaseFirestore.instance.collection(
+        FirebaseConstants.categories,
+      );
 
   Stream<List<CategoryModel>> getCategories() {
     return _categoriesRef
-        .orderBy('name')
+        .orderBy(FirebaseConstants.name)
         .snapshots()
         .map(
           (snapshot) =>

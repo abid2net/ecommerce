@@ -1,5 +1,5 @@
+import 'package:ecommerce/common/common.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:equatable/equatable.dart';
 import 'package:ecommerce/models/product_model.dart';
 import 'package:ecommerce/repositories/cart_repository.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -54,9 +54,9 @@ class CartBloc extends Bloc<CartEvent, CartState> {
 
     // Delete all cart items
     final cartRef = _firestore
-        .collection('users')
+        .collection(FirebaseConstants.users)
         .doc(userId)
-        .collection('cart');
+        .collection(FirebaseConstants.cart);
 
     final cartDocs = await cartRef.get();
     for (var doc in cartDocs.docs) {

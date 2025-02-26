@@ -78,4 +78,30 @@ class ProductModel extends Equatable {
       reviewCount: (map['reviewCount'] as int?) ?? 0,
     );
   }
+
+  ProductModel copyWith({
+    String? id,
+    String? name,
+    double? price,
+    List<String>? images,
+    String? description,
+    String? brand,
+    CategoryModel? category,
+    int? quantity,
+    double? rating,
+    int? reviewCount,
+  }) {
+    return ProductModel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      price: price ?? this.price,
+      images: images ?? this.images,
+      description: description ?? this.description,
+      brand: brand ?? this.brand,
+      category: category ?? this.category,
+      quantity: quantity ?? this.quantity,
+      rating: rating ?? this.rating,
+      reviewCount: reviewCount ?? this.reviewCount,
+    );
+  }
 }

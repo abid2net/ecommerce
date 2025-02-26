@@ -49,4 +49,32 @@ class CartRepository {
         .doc(productId)
         .delete();
   }
+
+  Future<void> updateCart(List<ProductModel> products) async {
+    final userId = _auth.currentUser?.uid;
+    if (userId == null) return;
+
+    final batch = _firestore.batch();
+    final cartRef = _firestore
+        .collection(FirebaseConstants.users)
+        .doc(userId)
+        .collection(FirebaseConstants.cart);
+
+    // First delete all existing items
+    final existingDocs = await cartRef.get();
+    for (var doc in existingDocs.docs) {
+      batch.delete(doc.reference);
+    }
+
+    // Then add all products with updated quantities
+    for (var product in products) {
+      final docRef = cartRef.doc(product.id);
+      batch.set(docRef, {
+        ...product.toMap(),
+        'quantity': product.quantity ?? 1,
+      });
+    }
+
+    await batch.commit();
+  }
 }

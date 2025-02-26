@@ -9,6 +9,8 @@ class OrderModel {
   final double total;
   final OrderStatus status;
   final DateTime createdAt;
+  final String? discountCode;
+  final double? discountPercentage;
 
   const OrderModel({
     required this.id,
@@ -17,6 +19,8 @@ class OrderModel {
     required this.total,
     required this.status,
     required this.createdAt,
+    this.discountCode,
+    this.discountPercentage,
   });
 
   Map<String, dynamic> toMap() {
@@ -27,6 +31,8 @@ class OrderModel {
       'total': total,
       'status': status.name,
       'createdAt': createdAt.toIso8601String(),
+      'discountCode': discountCode,
+      'discountPercentage': discountPercentage,
     };
   }
 
@@ -44,6 +50,8 @@ class OrderModel {
         orElse: () => OrderStatus.pending,
       ),
       createdAt: DateTime.parse(map['createdAt'] as String),
+      discountCode: map['discountCode'] as String?,
+      discountPercentage: (map['discountPercentage'] as num?)?.toDouble(),
     );
   }
 }

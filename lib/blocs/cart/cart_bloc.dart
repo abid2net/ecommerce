@@ -4,6 +4,7 @@ import 'package:ecommerce/models/product_model.dart';
 import 'package:ecommerce/repositories/cart_repository.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:equatable/equatable.dart';
 
 part 'cart_event.dart';
 part 'cart_state.dart';
@@ -21,6 +22,18 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     on<LoadCart>(_onLoadCart);
     on<RemoveFromCart>(_onRemoveFromCart);
     on<ClearCart>(_onClearCart);
+    on<UpdateCartItemQuantity>((event, emit) async {
+      final updatedProducts =
+          state.products.map((product) {
+            if (product.id == event.productId) {
+              return product.copyWith(quantity: event.quantity);
+            }
+            return product;
+          }).toList();
+
+      emit(CartState(updatedProducts));
+      await _cartRepository.updateCart(updatedProducts);
+    });
 
     add(LoadCart()); // Load cart when bloc is created
   }

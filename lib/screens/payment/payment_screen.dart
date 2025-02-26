@@ -6,12 +6,34 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ecommerce/blocs/cart/cart_bloc.dart';
 import 'package:ecommerce/repositories/order_repository.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:ecommerce/models/discount_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class PaymentScreen extends StatelessWidget {
+class PaymentScreen extends StatefulWidget {
   final double total;
   final List<ProductModel> products;
 
   const PaymentScreen({super.key, required this.total, required this.products});
+
+  @override
+  State createState() => _PaymentScreenState();
+}
+
+class _PaymentScreenState extends State<PaymentScreen> {
+  final _discountController = TextEditingController();
+  DiscountModel? _appliedDiscount;
+  bool _isValidating = false;
+
+  @override
+  void dispose() {
+    _discountController.dispose();
+    super.dispose();
+  }
+
+  double get _discountedTotal {
+    if (_appliedDiscount == null) return widget.total;
+    return widget.total * (1 - _appliedDiscount!.percentage / 100);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,19 +55,86 @@ class PaymentScreen extends StatelessWidget {
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     const SizedBox(height: 16),
-                    Text(
-                      'Total Amount: \$${total.toStringAsFixed(2)}',
-                      style: Theme.of(context).textTheme.titleMedium,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text('Subtotal:'),
+                        Text('\$${widget.total.toStringAsFixed(2)}'),
+                      ],
                     ),
-                    Text(
-                      'Items: ${products.length}',
-                      style: Theme.of(context).textTheme.bodyLarge,
+                    if (_appliedDiscount != null) ...[
+                      const SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Discount (${_appliedDiscount!.percentage}%):'),
+                          Text(
+                            '-\$${(widget.total - _discountedTotal).toStringAsFixed(2)}',
+                          ),
+                        ],
+                      ),
+                    ],
+                    const Divider(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Total:',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        Text(
+                          '\$${_discountedTotal.toStringAsFixed(2)}',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 16),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Discount Code',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _discountController,
+                            decoration: const InputDecoration(
+                              hintText: 'Enter code',
+                              border: OutlineInputBorder(),
+                            ),
+                            enabled: _appliedDiscount == null,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        _isValidating
+                            ? const CircularProgressIndicator()
+                            : TextButton(
+                              onPressed:
+                                  _appliedDiscount == null
+                                      ? _validateDiscount
+                                      : _removeDiscount,
+                              child: Text(
+                                _appliedDiscount == null ? 'Apply' : 'Remove',
+                              ),
+                            ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const Spacer(),
             ElevatedButton(
               onPressed: () => _confirmPayment(context),
               child: const Padding(
@@ -59,6 +148,75 @@ class PaymentScreen extends StatelessWidget {
     );
   }
 
+  Future<void> _validateDiscount() async {
+    final code = _discountController.text.trim();
+    if (code.isEmpty) return;
+
+    setState(() => _isValidating = true);
+
+    try {
+      final snapshot =
+          await FirebaseFirestore.instance
+              .collection('discounts')
+              .where('code', isEqualTo: code)
+              .where('isActive', isEqualTo: true)
+              .get();
+
+      if (snapshot.docs.isNotEmpty) {
+        final discount = DiscountModel.fromMap(snapshot.docs.first.data());
+
+        // Check if discount is expired
+        if (discount.expiryDate != null &&
+            discount.expiryDate!.isBefore(DateTime.now()) &&
+            mounted) {
+          showErrorSnackBar(
+            context: context,
+            message: 'This discount code has expired',
+          );
+          return;
+        }
+
+        // Check if discount is valid for products in cart
+        if (!discount.isValidForProducts(widget.products)) {
+          if (mounted) {
+            showErrorSnackBar(
+              context: context,
+              message:
+                  'This discount code is not valid for the selected products',
+            );
+          }
+          return;
+        }
+
+        setState(() => _appliedDiscount = discount);
+        if (mounted) {
+          showSuccessSnackBar(
+            context: context,
+            message: 'Discount applied successfully!',
+          );
+        }
+      } else {
+        if (mounted) {
+          showErrorSnackBar(context: context, message: 'Invalid discount code');
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        showErrorSnackBar(
+          context: context,
+          message: 'Error validating discount code',
+        );
+      }
+    } finally {
+      setState(() => _isValidating = false);
+    }
+  }
+
+  void _removeDiscount() {
+    setState(() => _appliedDiscount = null);
+    _discountController.clear();
+  }
+
   Future<void> _confirmPayment(BuildContext context) async {
     try {
       final userId = FirebaseAuth.instance.currentUser?.uid;
@@ -70,8 +228,10 @@ class PaymentScreen extends StatelessWidget {
       final order = OrderModel(
         id: orderId,
         userId: userId,
-        products: products,
-        total: total,
+        products: widget.products,
+        total: _discountedTotal,
+        discountCode: _appliedDiscount?.code,
+        discountPercentage: _appliedDiscount?.percentage,
         status: OrderStatus.pending,
         createdAt: DateTime.now(),
       );
@@ -83,20 +243,12 @@ class PaymentScreen extends StatelessWidget {
         builder: (context) => const Center(child: CircularProgressIndicator()),
       );
 
-      // Create order in Firestore
       await orderRepository.createOrder(order);
 
-      // Clear cart
       if (context.mounted) {
         context.read<CartBloc>().add(ClearCart());
-      }
-
-      // Close loading dialog and payment screen
-      if (context.mounted) {
         Navigator.pop(context); // Close loading dialog
         Navigator.pop(context); // Close payment screen
-
-        // Show success message
         showSuccessSnackBar(
           context: context,
           message: 'Order placed successfully!',
@@ -104,7 +256,7 @@ class PaymentScreen extends StatelessWidget {
       }
     } catch (e) {
       if (context.mounted) {
-        Navigator.pop(context); // Close loading dialog
+        Navigator.pop(context);
         showErrorSnackBar(context: context, message: 'Error: ${e.toString()}');
       }
     }

@@ -1,4 +1,3 @@
-import 'package:ecommerce/common/common.dart';
 import 'package:ecommerce/screens/payment/payment_screen.dart';
 import 'package:ecommerce/theme/app_theme.dart';
 import 'package:ecommerce/widgets/rating_bar.dart';
@@ -10,9 +9,8 @@ import 'package:ecommerce/blocs/wishlist/wishlist_bloc.dart';
 import 'package:ecommerce/blocs/cart/cart_bloc.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dots_indicator/dots_indicator.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:ecommerce/models/review_model.dart';
 import 'package:ecommerce/widgets/review_card.dart';
+import 'package:ecommerce/blocs/review/review_bloc.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   final ProductModel product;
@@ -25,6 +23,13 @@ class ProductDetailsScreen extends StatefulWidget {
 
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   int _currentImageIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    // Load reviews when screen is initialized
+    context.read<ReviewBloc>().add(LoadReviews(widget.product.id));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -195,44 +200,36 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  StreamBuilder<List<ReviewModel>>(
-                    stream: FirebaseFirestore.instance
-                        .collection(FirebaseConstants.products)
-                        .doc(widget.product.id)
-                        .collection(FirebaseConstants.reviews)
-                        .orderBy(FirebaseConstants.createdAt, descending: true)
-                        .snapshots()
-                        .map(
-                          (snapshot) =>
-                              snapshot.docs
-                                  .map((doc) => ReviewModel.fromMap(doc.data()))
-                                  .toList(),
-                        ),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasError) {
-                        return Center(child: Text('Error: ${snapshot.error}'));
-                      }
-
-                      if (snapshot.connectionState == ConnectionState.waiting) {
+                  BlocBuilder<ReviewBloc, ReviewState>(
+                    builder: (context, state) {
+                      if (state is ReviewLoading) {
                         return const Center(child: CircularProgressIndicator());
                       }
 
-                      final reviews = snapshot.data ?? [];
-
-                      if (reviews.isEmpty) {
-                        return const Center(child: Text('No reviews yet'));
+                      if (state is ReviewError) {
+                        return Center(child: Text('Error: ${state.message}'));
                       }
 
-                      return ListView.separated(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: reviews.length,
-                        separatorBuilder: (context, index) => const Divider(),
-                        itemBuilder: (context, index) {
-                          final review = reviews[index];
-                          return ReviewCard(review: review);
-                        },
-                      );
+                      if (state is ReviewLoaded) {
+                        final reviews = state.reviews;
+
+                        if (reviews.isEmpty) {
+                          return const Center(child: Text('No reviews yet'));
+                        }
+
+                        return ListView.separated(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: reviews.length,
+                          separatorBuilder: (context, index) => const Divider(),
+                          itemBuilder: (context, index) {
+                            final review = reviews[index];
+                            return ReviewCard(review: review);
+                          },
+                        );
+                      }
+
+                      return const SizedBox();
                     },
                   ),
                 ],

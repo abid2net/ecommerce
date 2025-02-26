@@ -17,6 +17,8 @@ import 'blocs/order/order_bloc.dart';
 import 'repositories/order_repository.dart';
 import 'repositories/category_repository.dart';
 import 'blocs/category/category_bloc.dart';
+import 'blocs/review/review_bloc.dart';
+import 'repositories/review_repository.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -49,6 +51,13 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider(
           create: (_) => CategoryBloc(categoryRepository: CategoryRepository()),
+        ),
+        BlocProvider(
+          create:
+              (context) => ReviewBloc(
+                reviewRepository: ReviewRepository(),
+                productBloc: context.read<ProductBloc>(),
+              ),
         ),
       ],
       child: MaterialApp(

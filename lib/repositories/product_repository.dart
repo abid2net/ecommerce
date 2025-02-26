@@ -1,9 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecommerce/common/common.dart';
 import 'package:ecommerce/models/product_model.dart';
+import 'package:ecommerce/models/review_model.dart';
 
 class ProductRepository {
-  final _firestore = FirebaseFirestore.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<void> addProduct(ProductModel product) async {
     await _firestore
@@ -24,18 +25,52 @@ class ProductRepository {
   }
 
   Stream<List<ProductModel>> getProducts() {
-    return _firestore.collection(FirebaseConstants.products).snapshots().map((
-      snapshot,
-    ) {
-      debugLog(
-        'Firestore snapshot received: ${snapshot.docs.length} documents',
-      ); // Debug print
-      return snapshot.docs.map((doc) {
-        final data = doc.data();
-        data['id'] = doc.id; // Ensure ID is included
-        debugLog('Processing document: ${doc.id}'); // Debug print
-        return ProductModel.fromMap(data);
-      }).toList();
-    });
+    return _firestore
+        .collection(FirebaseConstants.products)
+        .snapshots()
+        .asyncMap((snapshot) async {
+          final products = await Future.wait(
+            snapshot.docs.map((doc) async {
+              final data = doc.data();
+              data['id'] = doc.id;
+
+              // Fetch reviews for this product
+              final reviewsSnapshot =
+                  await _firestore
+                      .collection(FirebaseConstants.products)
+                      .doc(doc.id)
+                      .collection(FirebaseConstants.reviews)
+                      .get();
+
+              final reviews =
+                  reviewsSnapshot.docs
+                      .map((reviewDoc) => ReviewModel.fromMap(reviewDoc.data()))
+                      .toList();
+
+              // Calculate average rating and review count
+              double avgRating = 0;
+              if (reviews.isNotEmpty) {
+                avgRating =
+                    reviews.fold(
+                      0.0,
+                      (sumval, review) => sumval + review.rating,
+                    ) /
+                    reviews.length;
+              }
+
+              // Update product data with reviews info
+              data['rating'] = avgRating;
+              data['reviewCount'] = reviews.length;
+
+              debugLog(
+                'Processing product: ${doc.id} with ${reviews.length} reviews',
+              );
+              return ProductModel.fromMap(data);
+            }),
+          );
+
+          debugLog('Loaded ${products.length} products with reviews');
+          return products;
+        });
   }
 }

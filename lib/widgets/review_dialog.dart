@@ -1,11 +1,11 @@
 import 'package:ecommerce/common/common.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecommerce/blocs/auth/auth_bloc.dart';
 import 'package:ecommerce/blocs/auth/auth_state.dart';
 import 'package:ecommerce/models/review_model.dart';
 import 'package:ecommerce/models/user_model.dart';
+import 'package:ecommerce/blocs/review/review_bloc.dart';
 
 class ReviewDialog extends StatefulWidget {
   final String productId;
@@ -83,10 +83,8 @@ class _ReviewDialogState extends State<ReviewDialog> {
     }
     if (currentUser == null) {
       Navigator.of(context).pop();
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please login to write a review')),
-        );
+      if (mounted) {
+        showErrorSnackBar(context, 'Please login to write a review');
       }
       return;
     }
@@ -102,31 +100,15 @@ class _ReviewDialogState extends State<ReviewDialog> {
     );
 
     try {
-      await FirebaseFirestore.instance
-          .collection(FirebaseConstants.products)
-          .doc(widget.productId)
-          .collection(FirebaseConstants.reviews)
-          .doc(review.id)
-          .set(review.toMap());
-
+      context.read<ReviewBloc>().add(AddReview(review));
       if (mounted) {
         Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Review submitted successfully'),
-            backgroundColor: Colors.green,
-          ),
-        );
+        showSuccessSnackBar(context, 'Review submitted successfully');
       }
     } catch (e) {
       if (mounted) {
         Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        showErrorSnackBar(context, 'Error: ${e.toString()}');
       }
     }
   }

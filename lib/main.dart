@@ -65,6 +65,7 @@ class MyApp extends StatelessWidget {
         theme: AppTheme.lightTheme,
         home: const AppController(),
         routes: Routes.getRoutes(),
+        debugShowCheckedModeBanner: false,
       ),
     );
   }

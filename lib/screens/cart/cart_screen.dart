@@ -126,6 +126,11 @@ class CartItem extends StatelessWidget {
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   const SizedBox(height: 4),
+                  if (product.brand.isNotEmpty)
+                    Text(
+                      product.brand,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
                   Text(
                     '\$${product.price.toStringAsFixed(2)}',
                     style: Theme.of(context).textTheme.bodyLarge,

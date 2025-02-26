@@ -9,6 +9,7 @@ class ProductModel extends Equatable {
   final double price;
   final List<String> images;
   final CategoryModel category;
+  final String brand;
   final int? quantity;
   final double rating;
   final int reviewCount;
@@ -20,6 +21,7 @@ class ProductModel extends Equatable {
     required this.price,
     this.images = const [],
     required this.category,
+    required this.brand,
     this.quantity,
     this.rating = 0.0,
     this.reviewCount = 0,
@@ -33,6 +35,7 @@ class ProductModel extends Equatable {
     price,
     images,
     category,
+    brand,
     quantity,
     rating,
     reviewCount,
@@ -46,6 +49,7 @@ class ProductModel extends Equatable {
       'price': price,
       'images': images,
       'category': category.toMap(),
+      'brand': brand,
       'quantity': quantity,
       'rating': rating,
       'reviewCount': reviewCount,
@@ -68,6 +72,7 @@ class ProductModel extends Equatable {
                 icon: Icons.info,
               )
               : CategoryModel.fromMap(map['category'] as Map<String, dynamic>),
+      brand: (map['brand'] ?? '') as String,
       quantity: map['quantity'] as int?,
       rating: (map['rating'] as num?)?.toDouble() ?? 0.0,
       reviewCount: (map['reviewCount'] as int?) ?? 0,

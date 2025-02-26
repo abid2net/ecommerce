@@ -23,6 +23,11 @@ class ProductListItem extends StatelessWidget {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (product.brand.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 3.0),
+                child: Text(product.brand),
+              ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 5.0),
               child: Text('\$${product.price.toStringAsFixed(2)}'),

@@ -145,6 +145,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
+                    'Brand: ${widget.product.brand}',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
                     'Category: ${widget.product.category.displayName}',
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
@@ -295,6 +300,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                     price: widget.product.price,
                                     images: widget.product.images,
                                     description: widget.product.description,
+                                    brand: widget.product.brand,
                                     category: widget.product.category,
                                     quantity: quantity,
                                   ),

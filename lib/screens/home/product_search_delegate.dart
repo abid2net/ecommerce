@@ -66,7 +66,13 @@ class ProductSearchDelegate extends SearchDelegate {
                         )
                         : const Icon(Icons.image, size: 50),
                 title: Text(product.name),
-                subtitle: Text('\$${product.price.toStringAsFixed(2)}'),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (product.brand.isNotEmpty) Text(product.brand),
+                    Text('\$${product.price.toStringAsFixed(2)}'),
+                  ],
+                ),
                 onTap: () {
                   close(context, null);
                   Navigator.push(

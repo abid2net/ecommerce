@@ -250,6 +250,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
+                  if (product.brand.isNotEmpty)
+                    Text(
+                      product.brand,
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  const SizedBox(height: 4),
+
                   Row(
                     children: [
                       RatingBar(rating: product.rating, size: 14),

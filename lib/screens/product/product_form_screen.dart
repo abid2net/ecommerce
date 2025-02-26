@@ -20,6 +20,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   late TextEditingController _nameController;
   late TextEditingController _descriptionController;
   late TextEditingController _priceController;
+  late TextEditingController _brandController;
   final List<TextEditingController> _imageUrlControllers = [];
   CategoryModel? _selectedCategory;
 
@@ -33,6 +34,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     _priceController = TextEditingController(
       text: widget.product?.price.toString(),
     );
+    _brandController = TextEditingController(text: widget.product?.brand);
 
     if (widget.product?.images.isNotEmpty == true) {
       for (var imageUrl in widget.product!.images) {
@@ -75,6 +77,13 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                 TextFormField(
                   controller: _nameController,
                   decoration: const InputDecoration(labelText: 'Name'),
+                  validator:
+                      (value) => value?.isEmpty ?? true ? 'Required' : null,
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _brandController,
+                  decoration: const InputDecoration(labelText: 'Brand'),
                   validator:
                       (value) => value?.isEmpty ?? true ? 'Required' : null,
                 ),
@@ -211,6 +220,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       name: _nameController.text,
       description: _descriptionController.text,
       price: double.parse(_priceController.text),
+      brand: _brandController.text,
       images:
           _imageUrlControllers
               .map((controller) => controller.text)
@@ -233,6 +243,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     _nameController.dispose();
     _descriptionController.dispose();
     _priceController.dispose();
+    _brandController.dispose();
     for (var controller in _imageUrlControllers) {
       controller.dispose();
     }

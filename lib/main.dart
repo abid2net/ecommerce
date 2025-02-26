@@ -19,6 +19,8 @@ import 'repositories/category_repository.dart';
 import 'blocs/category/category_bloc.dart';
 import 'blocs/review/review_bloc.dart';
 import 'repositories/review_repository.dart';
+import 'blocs/voucher/voucher_bloc.dart';
+import 'repositories/voucher_repository.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -58,6 +60,10 @@ class MyApp extends StatelessWidget {
                 reviewRepository: ReviewRepository(),
                 productBloc: context.read<ProductBloc>(),
               ),
+        ),
+        BlocProvider(
+          create:
+              (context) => VoucherBloc(voucherRepository: VoucherRepository()),
         ),
       ],
       child: MaterialApp(

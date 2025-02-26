@@ -1,3 +1,4 @@
+import 'package:ecommerce/screens/voucher/voucher_management_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:ecommerce/models/product_model.dart';
 import 'package:ecommerce/widgets/product/product_list_item.dart';
@@ -60,19 +61,30 @@ class _ProductListViewState extends State<ProductListView> {
       appBar: AppBar(
         title: const Text('Manage Products'),
         actions: [
-          PopupMenuButton(
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              if (value == 'manageCategories') {
+                Navigator.pushNamed(context, '/categories');
+              } else if (value == 'manageVouchers') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const VoucherManagementScreen(),
+                  ),
+                );
+              }
+            },
             itemBuilder:
                 (context) => [
                   const PopupMenuItem(
-                    value: 'categories',
+                    value: 'manageCategories',
                     child: Text('Manage Categories'),
                   ),
+                  const PopupMenuItem(
+                    value: 'manageVouchers',
+                    child: Text('Manage Vouchers'),
+                  ),
                 ],
-            onSelected: (value) {
-              if (value == 'categories') {
-                Navigator.pushNamed(context, '/categories');
-              }
-            },
           ),
           IconButton(
             icon: const Icon(Icons.add),

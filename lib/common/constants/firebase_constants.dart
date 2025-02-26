@@ -7,6 +7,7 @@ class FirebaseConstants {
   static const String orders = 'orders';
   static const String reviews = 'reviews';
   static const String wishlist = 'wishlist';
+  static const String addresses = 'addresses';
 
   // Storage Paths
   static const String profilePicturePath = 'profile_pictures';

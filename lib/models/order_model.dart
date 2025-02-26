@@ -1,4 +1,5 @@
 import 'package:ecommerce/models/product_model.dart';
+import 'package:ecommerce/models/address_model.dart';
 
 enum OrderStatus { pending, processing, shipped, delivered, cancelled }
 
@@ -11,6 +12,7 @@ class OrderModel {
   final DateTime createdAt;
   final String? discountCode;
   final double? discountPercentage;
+  final AddressModel? shippingAddress;
 
   const OrderModel({
     required this.id,
@@ -21,6 +23,7 @@ class OrderModel {
     required this.createdAt,
     this.discountCode,
     this.discountPercentage,
+    this.shippingAddress,
   });
 
   Map<String, dynamic> toMap() {
@@ -33,6 +36,7 @@ class OrderModel {
       'createdAt': createdAt.toIso8601String(),
       'discountCode': discountCode,
       'discountPercentage': discountPercentage,
+      'shippingAddress': shippingAddress?.toMap(),
     };
   }
 
@@ -52,6 +56,12 @@ class OrderModel {
       createdAt: DateTime.parse(map['createdAt'] as String),
       discountCode: map['discountCode'] as String?,
       discountPercentage: (map['discountPercentage'] as num?)?.toDouble(),
+      shippingAddress:
+          map['shippingAddress'] != null
+              ? AddressModel.fromMap(
+                map['shippingAddress'] as Map<String, dynamic>,
+              )
+              : null,
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:ecommerce/common/common.dart';
 import 'package:ecommerce/models/order_model.dart';
 import 'package:ecommerce/models/product_model.dart';
+import 'package:ecommerce/screens/address_selection_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ecommerce/blocs/cart/cart_bloc.dart';
@@ -8,6 +9,7 @@ import 'package:ecommerce/repositories/order_repository.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ecommerce/models/discount_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ecommerce/models/address_model.dart';
 
 class PaymentScreen extends StatefulWidget {
   final double total;
@@ -23,6 +25,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   final _discountController = TextEditingController();
   DiscountModel? _appliedDiscount;
   bool _isValidating = false;
+  AddressModel? _selectedAddress;
 
   @override
   void dispose() {
@@ -134,9 +137,55 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 ),
               ),
             ),
+            const SizedBox(height: 16),
+            Text(
+              'Select Address',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 8),
+            GestureDetector(
+              onTap: () async {
+                final address = await Navigator.push<AddressModel>(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AddressSelectionScreen(),
+                  ),
+                );
+                if (address != null) {
+                  setState(() {
+                    _selectedAddress = address;
+                  });
+                }
+              },
+              child: Container(
+                padding: const EdgeInsets.all(16.0),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  _selectedAddress != null
+                      ? '${_selectedAddress!.name}, ${_selectedAddress!.street}, ${_selectedAddress!.city}, ${_selectedAddress!.state}, ${_selectedAddress!.zipCode}, ${_selectedAddress!.country}'
+                      : 'Tap to select or add an address',
+                  style: TextStyle(
+                    color:
+                        _selectedAddress != null ? Colors.black : Colors.grey,
+                  ),
+                ),
+              ),
+            ),
             const Spacer(),
             ElevatedButton(
-              onPressed: () => _confirmPayment(context),
+              onPressed: () {
+                if (_selectedAddress == null) {
+                  showErrorSnackBar(
+                    context: context,
+                    message: 'Please select an address',
+                  );
+                  return;
+                }
+                _confirmPayment(context);
+              },
               child: const Padding(
                 padding: EdgeInsets.all(16.0),
                 child: Text('Confirm Payment'),
@@ -234,6 +283,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
         discountPercentage: _appliedDiscount?.percentage,
         status: OrderStatus.pending,
         createdAt: DateTime.now(),
+        shippingAddress: _selectedAddress,
       );
 
       // Show loading dialog

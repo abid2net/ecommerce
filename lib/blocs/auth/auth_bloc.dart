@@ -12,7 +12,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       super(AuthInitial()) {
     on<SignUpWithEmailEvent>(_onSignUpWithEmail);
     on<SignInWithEmailEvent>(_onSignInWithEmail);
-    on<SignInWithGoogleEvent>(_onSignInWithGoogle);
+    on<GoogleSignIn>(_onGoogleSignIn);
     on<SignOutEvent>(_onSignOut);
     on<UpdateProfileEvent>(_onUpdateProfile);
     on<ResetPasswordEvent>(_onResetPassword);
@@ -21,14 +21,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthStateChangedEvent>((event, emit) async {
       try {
         if (event.user != null) {
-          final userData = await _authRepository.getUserData(event.user!.uid);
+          final userData = await _authRepository.getUserData(event.user!.id);
           if (userData != null) {
             emit(Authenticated(userData));
           } else {
             // Create basic user if data not found
             final basicUser = UserModel(
-              id: event.user!.uid,
-              email: event.user!.email!,
+              id: event.user!.id,
+              email: event.user!.email,
               role: UserRole.customer,
               createdAt: DateTime.now(),
               updatedAt: DateTime.now(),
@@ -48,15 +48,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     _checkInitialAuthState();
 
     // Listen to auth state changes
-    _authRepository.authStateChanges.listen(
-      (user) => add(AuthStateChangedEvent(user)),
+    _authRepository.user.listen(
+      (userModel) => add(AuthStateChangedEvent(userModel)),
     );
   }
 
   Future<void> _checkInitialAuthState() async {
     final currentUser = _authRepository.currentUser;
     if (currentUser != null) {
-      add(AuthStateChangedEvent(currentUser));
+      add(AuthStateChangedEvent(UserModel.fromFirebaseUser(currentUser)));
     } else {
       add(AuthStateChangedEvent(null));
     }
@@ -103,17 +103,32 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  Future<void> _onSignInWithGoogle(
-    SignInWithGoogleEvent event,
+  Future<void> _onGoogleSignIn(
+    GoogleSignIn event,
     Emitter<AuthState> emit,
   ) async {
     try {
       emit(AuthLoading());
-      final user = await _authRepository.signInWithGoogle();
-      if (user != null) {
-        emit(Authenticated(user));
+      final credential = null;
+      //await _authRepository.signInWithGoogle();
+
+      if (credential?.user != null) {
+        final user = credential!.user!;
+        // Create or update user in Firestore
+        final userModel = UserModel(
+          id: user.uid,
+          email: user.email!,
+          displayName: user.displayName,
+          photoUrl: user.photoURL,
+          role: UserRole.customer,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        );
+
+        await _authRepository.updateUserProfile(userModel);
+        emit(Authenticated(userModel));
       } else {
-        emit(Unauthenticated());
+        emit(const AuthError('Google sign in was cancelled'));
       }
     } catch (e) {
       emit(AuthError(e.toString()));

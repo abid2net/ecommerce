@@ -1,6 +1,7 @@
 import 'package:ecommerce/blocs/auth/auth_bloc.dart';
 import 'package:ecommerce/blocs/auth/auth_event.dart';
 import 'package:ecommerce/blocs/auth/auth_state.dart';
+import 'package:ecommerce/common/common.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -26,16 +27,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthError) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(state.message)));
+          showErrorSnackBar(context: context, message: state.message);
         } else if (state is Unauthenticated) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                'Password reset email sent. Please check your inbox.',
-              ),
-            ),
+          showSuccessSnackBar(
+            context: context,
+            message: 'Password reset email sent. Please check your inbox.',
           );
           Navigator.of(context).pop();
         }

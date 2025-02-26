@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 class AppTheme {
   static const double _borderRadius = 12.0;
   static const Color primaryColor = Colors.lightBlue;
-  static const Color secondaryColor = Color(0xFF2f6d80); // light maroon
-  static const Color tertiaryColor = Color(0xFF6aa4b0); // light maroon
+  static const Color secondaryColor = Color(0xFF2f6d80);
+  static const Color tertiaryColor = Color(0xFF6aa4b0);
+  static const Color quaternaryColor = Color(0xFFdf265e);
 
   static ThemeData lightTheme = ThemeData(
     useMaterial3: true,
@@ -33,11 +34,11 @@ class AppTheme {
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(_borderRadius),
-        borderSide: const BorderSide(color: Colors.red, width: 2),
+        borderSide: const BorderSide(color: quaternaryColor, width: 2),
       ),
       focusedErrorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(_borderRadius),
-        borderSide: const BorderSide(color: Colors.red, width: 2),
+        borderSide: const BorderSide(color: quaternaryColor, width: 2),
       ),
     ),
 

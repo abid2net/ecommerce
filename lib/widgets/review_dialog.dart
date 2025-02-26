@@ -84,7 +84,10 @@ class _ReviewDialogState extends State<ReviewDialog> {
     if (currentUser == null) {
       Navigator.of(context).pop();
       if (mounted) {
-        showErrorSnackBar(context, 'Please login to write a review');
+        showErrorSnackBar(
+          context: context,
+          message: 'Please login to write a review',
+        );
       }
       return;
     }
@@ -103,12 +106,15 @@ class _ReviewDialogState extends State<ReviewDialog> {
       context.read<ReviewBloc>().add(AddReview(review));
       if (mounted) {
         Navigator.of(context).pop();
-        showSuccessSnackBar(context, 'Review submitted successfully');
+        showSuccessSnackBar(
+          context: context,
+          message: 'Review submitted successfully',
+        );
       }
     } catch (e) {
       if (mounted) {
         Navigator.of(context).pop();
-        showErrorSnackBar(context, 'Error: ${e.toString()}');
+        showErrorSnackBar(context: context, message: 'Error: ${e.toString()}');
       }
     }
   }

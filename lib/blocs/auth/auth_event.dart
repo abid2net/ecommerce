@@ -1,6 +1,5 @@
 import 'package:ecommerce/models/user_model.dart';
 import 'package:equatable/equatable.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:io';
 
 abstract class AuthEvent extends Equatable {
@@ -63,6 +62,16 @@ class UpdatePasswordEvent extends AuthEvent {
 }
 
 class AuthStateChangedEvent extends AuthEvent {
-  final User? user;
+  final UserModel? user;
   const AuthStateChangedEvent(this.user);
+
+  @override
+  List<Object?> get props => [user];
+}
+
+class GoogleSignIn extends AuthEvent {
+  const GoogleSignIn();
+
+  @override
+  List<Object?> get props => [];
 }

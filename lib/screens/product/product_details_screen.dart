@@ -43,7 +43,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               return IconButton(
                 icon: Icon(
                   isInWishlist ? Icons.favorite : Icons.favorite_border,
-                  color: isInWishlist ? Colors.red : null,
+                  color: isInWishlist ? AppTheme.quaternaryColor : null,
                 ),
                 onPressed: () {
                   if (isInWishlist) {

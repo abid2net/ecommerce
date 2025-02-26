@@ -1,6 +1,7 @@
 import 'package:ecommerce/blocs/auth/auth_bloc.dart';
 import 'package:ecommerce/blocs/auth/auth_event.dart';
 import 'package:ecommerce/blocs/auth/auth_state.dart';
+import 'package:ecommerce/common/common.dart';
 import 'package:ecommerce/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -70,9 +71,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error picking image: $e')));
+        showErrorSnackBar(context: context, message: 'Error picking image: $e');
       }
     }
   }
@@ -82,18 +81,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthError) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(state.message)));
+          showErrorSnackBar(context: context, message: state.message);
         } else if (state is Authenticated) {
           if (_isEditingPassword) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Password updated successfully')),
+            showSuccessSnackBar(
+              context: context,
+              message: 'Password updated successfully',
             );
             _togglePasswordEdit();
           } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Profile updated successfully')),
+            showSuccessSnackBar(
+              context: context,
+              message: 'Profile updated successfully',
             );
           }
         }
@@ -119,19 +118,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Center(
                         child: Stack(
                           children: [
-                            CircleAvatar(
-                              radius: 50,
-                              backgroundImage:
-                                  _imageFile != null
-                                      ? FileImage(_imageFile!)
-                                      : (user.photoUrl != null
-                                              ? NetworkImage(user.photoUrl!)
-                                              : null)
-                                          as ImageProvider?,
-                              child:
-                                  user.photoUrl == null && _imageFile == null
-                                      ? const Icon(Icons.person, size: 50)
-                                      : null,
+                            Container(
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Theme.of(context).primaryColor,
+                                  width: 3,
+                                ),
+                              ),
+                              child: CircleAvatar(
+                                radius: 50,
+                                backgroundImage:
+                                    _imageFile != null
+                                        ? FileImage(_imageFile!)
+                                        : (user.photoUrl != null
+                                                ? NetworkImage(user.photoUrl!)
+                                                : null)
+                                            as ImageProvider?,
+                                child:
+                                    user.photoUrl == null && _imageFile == null
+                                        ? const Icon(Icons.person, size: 50)
+                                        : null,
+                              ),
                             ),
                             Positioned(
                               right: -10,

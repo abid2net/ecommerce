@@ -1,6 +1,7 @@
 import 'package:ecommerce/blocs/auth/auth_bloc.dart';
 import 'package:ecommerce/blocs/auth/auth_event.dart';
 import 'package:ecommerce/blocs/auth/auth_state.dart';
+import 'package:ecommerce/common/common.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'signup_screen.dart';
@@ -30,9 +31,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthError) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(state.message)));
+          showErrorSnackBar(context: context, message: state.message);
         }
       },
       child: Scaffold(
@@ -116,12 +115,18 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: const Text('Forgot Password?'),
                   ),
                   const SizedBox(height: 16),
-                  ElevatedButton.icon(
+                  ElevatedButton(
                     onPressed: () {
-                      context.read<AuthBloc>().add(SignInWithGoogleEvent());
+                      context.read<AuthBloc>().add(GoogleSignIn());
                     },
-                    icon: const Icon(Icons.g_mobiledata),
-                    label: const Text('Sign in with Google'),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.g_mobiledata),
+                        const SizedBox(width: 8),
+                        const Text('Sign in with Google'),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 24),
                   Row(

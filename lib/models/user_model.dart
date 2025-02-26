@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 enum UserRole { admin, customer }
 
@@ -82,6 +83,18 @@ class UserModel extends Equatable {
   }
 
   bool get isAdmin => role == UserRole.admin;
+
+  factory UserModel.fromFirebaseUser(User firebaseUser) {
+    return UserModel(
+      id: firebaseUser.uid,
+      email: firebaseUser.email!,
+      displayName: firebaseUser.displayName,
+      photoUrl: firebaseUser.photoURL,
+      role: UserRole.customer,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+  }
 
   @override
   List<Object?> get props => [

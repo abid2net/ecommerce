@@ -1,3 +1,4 @@
+import 'package:ecommerce/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ecommerce/screens/home/home_screen.dart';
@@ -54,6 +55,7 @@ class _CustomerLayoutScreenState extends State<CustomerLayoutScreen>
               const Tab(icon: Icon(Icons.home), text: 'Home'),
               Tab(
                 icon: Badge(
+                  backgroundColor: AppTheme.quaternaryColor,
                   isLabelVisible: itemCount > 0,
                   label: Text(itemCount.toString()),
                   child: const Icon(Icons.shopping_cart),

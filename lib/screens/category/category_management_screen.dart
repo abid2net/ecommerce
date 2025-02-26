@@ -1,3 +1,4 @@
+import 'package:ecommerce/common/common.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ecommerce/blocs/category/category_bloc.dart';
@@ -22,12 +23,7 @@ class CategoryManagementScreen extends StatelessWidget {
       body: BlocConsumer<CategoryBloc, CategoryState>(
         listener: (context, state) {
           if (state is CategoryError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: Colors.red,
-              ),
-            );
+            showErrorSnackBar(context: context, message: state.message);
           }
         },
         builder: (context, state) {

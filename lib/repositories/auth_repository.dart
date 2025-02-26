@@ -26,7 +26,13 @@ class AuthRepository {
        _firestore = firestore ?? FirebaseFirestore.instance,
        _storage = storage ?? FirebaseStorage.instance;
 
-  Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
+  Stream<UserModel?> get user {
+    return _firebaseAuth.authStateChanges().map((firebaseUser) {
+      return firebaseUser == null
+          ? null
+          : UserModel.fromFirebaseUser(firebaseUser);
+    });
+  }
 
   User? get currentUser => _firebaseAuth.currentUser;
 
@@ -74,45 +80,29 @@ class AuthRepository {
     return null;
   }
 
-  Future<UserModel?> signInWithGoogle() async {
+  Future<UserCredential?> signInWithGoogle() async {
     try {
+      // Trigger the authentication flow
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+
       if (googleUser == null) return null;
 
+      // Obtain the auth details from the request
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
+
+      // Create a new credential
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      final userCredential = await _firebaseAuth.signInWithCredential(
-        credential,
-      );
-      if (userCredential.user != null) {
-        final existingUser = await getUserData(userCredential.user!.uid);
-        if (existingUser != null) return existingUser;
-
-        final user = UserModel(
-          id: userCredential.user!.uid,
-          email: userCredential.user!.email!,
-          displayName: userCredential.user!.displayName,
-          photoUrl: userCredential.user!.photoURL,
-          role: UserRole.customer,
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
-        );
-
-        await _firestore
-            .collection(FirebaseConstants.users)
-            .doc(user.id)
-            .set(user.toMap());
-        return user;
-      }
+      // Once signed in, return the UserCredential
+      return await _firebaseAuth.signInWithCredential(credential);
     } catch (e) {
-      throw Exception(e.toString());
+      debugLog('Error signing in with Google: $e');
+      rethrow;
     }
-    return null;
   }
 
   Future<void> signOut() async {
@@ -171,9 +161,11 @@ class AuthRepository {
   Future<void> updateUserProfile(UserModel user, {File? imageFile}) async {
     try {
       String? photoUrl = user.photoUrl;
-      if (imageFile != null) {
-        photoUrl = await uploadProfilePicture(user.id, imageFile);
-      }
+
+      // TODO: Upload profile picture to Firebase Storage (Paid service)
+      // if (imageFile != null) {
+      //   photoUrl = await uploadProfilePicture(user.id, imageFile);
+      // }
 
       final updatedUser = user.copyWith(photoUrl: photoUrl);
       await _firestore

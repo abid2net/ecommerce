@@ -1,3 +1,4 @@
+import 'package:ecommerce/common/common.dart';
 import 'package:ecommerce/models/order_model.dart';
 import 'package:ecommerce/models/product_model.dart';
 import 'package:flutter/material.dart';
@@ -96,22 +97,15 @@ class PaymentScreen extends StatelessWidget {
         Navigator.pop(context); // Close payment screen
 
         // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Order placed successfully!'),
-            backgroundColor: Colors.green,
-          ),
+        showSuccessSnackBar(
+          context: context,
+          message: 'Order placed successfully!',
         );
       }
     } catch (e) {
       if (context.mounted) {
         Navigator.pop(context); // Close loading dialog
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        showErrorSnackBar(context: context, message: 'Error: ${e.toString()}');
       }
     }
   }

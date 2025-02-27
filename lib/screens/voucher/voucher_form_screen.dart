@@ -1,3 +1,4 @@
+import 'package:ecommerce/common/widgets/custom_loading.dart';
 import 'package:ecommerce/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:ecommerce/models/voucher_model.dart'; // Import your voucher model
@@ -172,7 +173,7 @@ class _VoucherFormScreenState extends State<VoucherFormScreen> {
                   stream: CategoryRepository().getCategories(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const CircularProgressIndicator();
+                      return const CustomLoadingIndicator();
                     }
                     if (snapshot.hasError) {
                       return Text('Error: ${snapshot.error}');

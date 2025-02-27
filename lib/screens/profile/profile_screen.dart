@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
-import 'package:ecommerce/widgets/global_loading.dart';
+import 'package:ecommerce/common/widgets/custom_loading.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -99,7 +99,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       },
       builder: (context, state) {
         if (state is! Authenticated) {
-          return const GlobalLoading();
+          return const CustomLoadingIndicator(isFullScreen: true);
         }
 
         final user = state.user;
@@ -306,11 +306,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             },
                                     child:
                                         state is AuthLoading
-                                            ? const SizedBox(
-                                              height: 20,
-                                              width: 20,
-                                              child: GlobalLoading(),
-                                            )
+                                            ? CustomLoadingIndicator(size: 20)
                                             : const Text('Update Password'),
                                   );
                                 },
@@ -337,7 +333,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
             ),
-            if (state is AuthLoading) const GlobalLoading(),
+            if (state is AuthLoading)
+              const CustomLoadingIndicator(isFullScreen: true),
           ],
         );
       },

@@ -24,3 +24,13 @@ class AddReview extends ReviewEvent {
   @override
   List<Object> get props => [review];
 }
+
+// New event for deleting a review
+class DeleteReview extends ReviewEvent {
+  final ReviewModel review;
+
+  const DeleteReview(this.review);
+
+  @override
+  List<Object> get props => [review];
+}

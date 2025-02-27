@@ -1,3 +1,4 @@
+import 'package:ecommerce/common/widgets/custom_loading.dart';
 import 'package:ecommerce/screens/home/product_search_delegate.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -76,7 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
               },
               builder: (context, state) {
                 if (state is ProductLoading) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const CustomLoadingIndicator();
                 }
 
                 if (state is ProductLoaded) {
@@ -145,7 +146,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         (value) => setState(() => _selectedCategory = value),
                   );
                 }
-                return const CircularProgressIndicator();
+                return const CustomLoadingIndicator();
               },
             ),
           ),

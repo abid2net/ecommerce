@@ -1,3 +1,4 @@
+import 'package:ecommerce/common/widgets/custom_loading.dart';
 import 'package:ecommerce/screens/new_address_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:ecommerce/models/address_model.dart';
@@ -14,7 +15,7 @@ class AddressSelectionScreen extends StatelessWidget {
         stream: AddressRepository().getAddresses(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const CustomLoadingIndicator();
           }
 
           final addresses = snapshot.data ?? [];

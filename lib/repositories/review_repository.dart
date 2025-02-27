@@ -28,4 +28,13 @@ class ReviewRepository {
         .doc(review.id)
         .set(review.toMap());
   }
+
+  Future<void> deleteReview(ReviewModel review) async {
+    await _firestore
+        .collection(FirebaseConstants.products)
+        .doc(review.productId)
+        .collection(FirebaseConstants.reviews)
+        .doc(review.id)
+        .delete();
+  }
 }

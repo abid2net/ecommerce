@@ -19,6 +19,7 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
        super(ReviewInitial()) {
     on<LoadReviews>(_onLoadReviews);
     on<AddReview>(_onAddReview);
+    on<DeleteReview>(_onDeleteReview);
   }
 
   Future<void> _onLoadReviews(
@@ -41,6 +42,19 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
     try {
       await _reviewRepository.addReview(event.review);
       _productBloc.add(LoadProducts());
+    } catch (e) {
+      emit(ReviewError(e.toString()));
+    }
+  }
+
+  Future<void> _onDeleteReview(
+    DeleteReview event,
+    Emitter<ReviewState> emit,
+  ) async {
+    try {
+      await _reviewRepository.deleteReview(event.review);
+      _productBloc.add(LoadProducts());
+      // emit(LoadReviews(event.review.productId));
     } catch (e) {
       emit(ReviewError(e.toString()));
     }

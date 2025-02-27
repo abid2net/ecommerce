@@ -1,3 +1,7 @@
+import 'package:ecommerce/blocs/auth/auth_bloc.dart';
+import 'package:ecommerce/blocs/auth/auth_state.dart';
+import 'package:ecommerce/common/widgets/custom_loading.dart';
+import 'package:ecommerce/models/user_model.dart';
 import 'package:ecommerce/screens/payment/payment_screen.dart';
 import 'package:ecommerce/theme/app_theme.dart';
 import 'package:ecommerce/widgets/rating_bar.dart';
@@ -23,12 +27,17 @@ class ProductDetailsScreen extends StatefulWidget {
 
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   int _currentImageIndex = 0;
+  bool isAdmin = false;
 
   @override
   void initState() {
     super.initState();
     // Load reviews when screen is initialized
     context.read<ReviewBloc>().add(LoadReviews(widget.product.id));
+    final authState = context.read<AuthBloc>().state;
+    if (authState is Authenticated) {
+      isAdmin = authState.user.role == UserRole.admin;
+    }
   }
 
   @override
@@ -37,28 +46,29 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       appBar: AppBar(
         title: Text(widget.product.name),
         actions: [
-          BlocBuilder<WishlistBloc, WishlistState>(
-            builder: (context, state) {
-              final isInWishlist = state.isInWishlist(widget.product.id);
-              return IconButton(
-                icon: Icon(
-                  isInWishlist ? Icons.favorite : Icons.favorite_border,
-                  color: isInWishlist ? AppTheme.quaternaryColor : null,
-                ),
-                onPressed: () {
-                  if (isInWishlist) {
-                    context.read<WishlistBloc>().add(
-                      RemoveFromWishlist(widget.product.id),
-                    );
-                  } else {
-                    context.read<WishlistBloc>().add(
-                      AddToWishlist(widget.product),
-                    );
-                  }
-                },
-              );
-            },
-          ),
+          if (!isAdmin)
+            BlocBuilder<WishlistBloc, WishlistState>(
+              builder: (context, state) {
+                final isInWishlist = state.isInWishlist(widget.product.id);
+                return IconButton(
+                  icon: Icon(
+                    isInWishlist ? Icons.favorite : Icons.favorite_border,
+                    color: isInWishlist ? AppTheme.quaternaryColor : null,
+                  ),
+                  onPressed: () {
+                    if (isInWishlist) {
+                      context.read<WishlistBloc>().add(
+                        RemoveFromWishlist(widget.product.id),
+                      );
+                    } else {
+                      context.read<WishlistBloc>().add(
+                        AddToWishlist(widget.product),
+                      );
+                    }
+                  },
+                );
+              },
+            ),
         ],
       ),
       body: SingleChildScrollView(
@@ -164,31 +174,36 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                   const SizedBox(height: 25),
-
-                  Center(
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width / 1.3,
-                      child: ElevatedButton(
-                        onPressed:
-                            () => _showQuantityDialog(context, isBuyNow: false),
-                        child: const Text('Add to Cart'),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Center(
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width / 1.3,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppTheme.tertiaryColor,
+                  if (!isAdmin) ...{
+                    Center(
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width / 1.3,
+                        child: ElevatedButton(
+                          onPressed:
+                              () =>
+                                  _showQuantityDialog(context, isBuyNow: false),
+                          child: const Text('Add to Cart'),
                         ),
-                        onPressed:
-                            () => _showQuantityDialog(context, isBuyNow: true),
-                        child: const Text('Buy now'),
                       ),
                     ),
-                  ),
+                    const SizedBox(height: 16),
+                    Center(
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width / 1.3,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppTheme.tertiaryColor,
+                          ),
+                          onPressed:
+                              () =>
+                                  _showQuantityDialog(context, isBuyNow: true),
+                          child: const Text('Buy now'),
+                        ),
+                      ),
+                    ),
+                  } else
+                    Divider(),
+
                   const SizedBox(height: 32),
                   // Reviews Section
                   Text(
@@ -196,19 +211,20 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 8),
-                  // Add Review Button
-                  Center(
-                    child: OutlinedButton.icon(
-                      onPressed: () => _showReviewDialog(context),
-                      icon: const Icon(Icons.rate_review),
-                      label: const Text('Write a Review'),
+                  if (!isAdmin)
+                    // Add Review Button
+                    Center(
+                      child: OutlinedButton.icon(
+                        onPressed: () => _showReviewDialog(context),
+                        icon: const Icon(Icons.rate_review),
+                        label: const Text('Write a Review'),
+                      ),
                     ),
-                  ),
                   const SizedBox(height: 16),
                   BlocBuilder<ReviewBloc, ReviewState>(
                     builder: (context, state) {
                       if (state is ReviewLoading) {
-                        return const Center(child: CircularProgressIndicator());
+                        return const CustomLoadingIndicator();
                       }
 
                       if (state is ReviewError) {
@@ -229,7 +245,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           separatorBuilder: (context, index) => const Divider(),
                           itemBuilder: (context, index) {
                             final review = reviews[index];
-                            return ReviewCard(review: review);
+                            return ReviewCard(review: review, isAdmin: isAdmin);
                           },
                         );
                       }

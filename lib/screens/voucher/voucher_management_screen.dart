@@ -1,3 +1,4 @@
+import 'package:ecommerce/common/widgets/custom_loading.dart';
 import 'package:flutter/material.dart';
 import 'package:ecommerce/models/voucher_model.dart'; // Import your voucher model
 import 'package:ecommerce/screens/voucher/voucher_form_screen.dart'; // Import the form screen for adding/editing vouchers
@@ -26,7 +27,7 @@ class _VoucherManagementScreenState extends State<VoucherManagementScreen> {
       body: BlocBuilder<VoucherBloc, VoucherState>(
         builder: (context, state) {
           if (state is VoucherLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return const CustomLoadingIndicator();
           }
 
           if (state is VoucherLoaded) {

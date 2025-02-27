@@ -1,4 +1,5 @@
 import 'package:ecommerce/common/common.dart';
+import 'package:ecommerce/common/widgets/custom_loading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ecommerce/blocs/category/category_bloc.dart';
@@ -28,7 +29,7 @@ class CategoryManagementScreen extends StatelessWidget {
         },
         builder: (context, state) {
           if (state is CategoryLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return const CustomLoadingIndicator();
           }
 
           if (state is CategoryLoaded) {

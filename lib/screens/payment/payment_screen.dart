@@ -1,4 +1,5 @@
 import 'package:ecommerce/common/common.dart';
+import 'package:ecommerce/common/widgets/custom_loading.dart';
 import 'package:ecommerce/models/order_model.dart';
 import 'package:ecommerce/models/product_model.dart';
 import 'package:ecommerce/screens/address_selection_screen.dart';
@@ -205,7 +206,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           ),
                           const SizedBox(width: 8),
                           _isValidating
-                              ? const CircularProgressIndicator()
+                              ? const CustomLoadingIndicator()
                               : TextButton(
                                 onPressed:
                                     _appliedDiscount == null
@@ -355,7 +356,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => const Center(child: CircularProgressIndicator()),
+        builder: (context) => const CustomLoadingIndicator(),
       );
 
       await orderRepository.createOrder(order);

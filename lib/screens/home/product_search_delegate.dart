@@ -1,3 +1,4 @@
+import 'package:ecommerce/common/widgets/custom_loading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ecommerce/blocs/product/product_bloc.dart';
@@ -87,7 +88,7 @@ class ProductSearchDelegate extends SearchDelegate {
             },
           );
         }
-        return const Center(child: CircularProgressIndicator());
+        return const CustomLoadingIndicator();
       },
     );
   }

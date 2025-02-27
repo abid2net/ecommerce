@@ -1,3 +1,4 @@
+import 'package:ecommerce/common/widgets/custom_loading.dart';
 import 'package:flutter/material.dart';
 import 'package:ecommerce/models/product_model.dart';
 import 'package:ecommerce/blocs/product/product_bloc.dart';
@@ -151,7 +152,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     return BlocBuilder<CategoryBloc, CategoryState>(
       builder: (context, state) {
         if (state is CategoryLoaded) {
-          if (!mounted) return const CircularProgressIndicator();
+          if (!mounted) return const CustomLoadingIndicator();
 
           // Create default tyre category
           final defaultCategory = CategoryModel(
@@ -204,7 +205,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
             validator: (value) => value == null ? 'Required' : null,
           );
         }
-        return const CircularProgressIndicator();
+        return const CustomLoadingIndicator();
       },
     );
   }

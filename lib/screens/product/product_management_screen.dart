@@ -1,3 +1,5 @@
+import 'package:ecommerce/common/widgets/custom_loading.dart';
+import 'package:ecommerce/screens/product/product_details_screen.dart';
 import 'package:ecommerce/screens/voucher/voucher_management_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:ecommerce/models/product_model.dart';
@@ -95,7 +97,7 @@ class _ProductListViewState extends State<ProductListView> {
       body: BlocBuilder<ProductBloc, ProductState>(
         builder: (context, state) {
           if (state is ProductLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return const CustomLoadingIndicator();
           }
 
           if (state is ProductLoaded) {
@@ -112,6 +114,15 @@ class _ProductListViewState extends State<ProductListView> {
                         arguments: product,
                       ),
                   onDelete: () => _showDeleteDialog(context, product),
+                  onTap:
+                      () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) =>
+                                  ProductDetailsScreen(product: product),
+                        ),
+                      ),
                 );
               },
             );

@@ -1,3 +1,4 @@
+import 'package:ecommerce/widgets/rating_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:ecommerce/models/product_model.dart';
 
@@ -5,12 +6,14 @@ class ProductListItem extends StatelessWidget {
   final ProductModel product;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
+  final VoidCallback? onTap;
 
   const ProductListItem({
     super.key,
     required this.product,
     required this.onEdit,
     required this.onDelete,
+    this.onTap,
   });
 
   @override
@@ -23,6 +26,13 @@ class ProductListItem extends StatelessWidget {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Row(
+              children: [
+                RatingBar(rating: product.rating, size: 14),
+                const SizedBox(width: 4),
+                Text('(${product.reviewCount})'),
+              ],
+            ),
             if (product.brand.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 3.0),
@@ -45,6 +55,7 @@ class ProductListItem extends StatelessWidget {
             IconButton(icon: const Icon(Icons.delete), onPressed: onDelete),
           ],
         ),
+        onTap: onTap,
       ),
     );
   }

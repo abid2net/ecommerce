@@ -2,6 +2,7 @@ import 'package:ecommerce/blocs/auth/auth_bloc.dart';
 import 'package:ecommerce/blocs/auth/auth_event.dart';
 import 'package:ecommerce/blocs/auth/auth_state.dart';
 import 'package:ecommerce/common/common.dart';
+import 'package:ecommerce/common/widgets/custom_loading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -115,7 +116,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 },
                         child:
                             state is AuthLoading
-                                ? const CircularProgressIndicator()
+                                ? const CustomLoadingIndicator()
                                 : const Text('Sign Up'),
                       );
                     },

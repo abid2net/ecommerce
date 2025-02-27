@@ -1,3 +1,4 @@
+import 'package:ecommerce/common/widgets/custom_loading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ecommerce/models/order_model.dart';
@@ -25,7 +26,7 @@ class _OrderScreenState extends State<OrderScreen> {
       body: BlocBuilder<OrderBloc, OrderState>(
         builder: (context, state) {
           if (state is OrderLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return const CustomLoadingIndicator();
           }
 
           if (state is OrderError) {

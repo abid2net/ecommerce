@@ -67,7 +67,7 @@ class AppTheme {
 
     // Navigation bar theme
     navigationBarTheme: NavigationBarThemeData(
-      indicatorColor: primaryColor.withValues(alpha: 0.1),
+      indicatorColor: primaryColor.withValues(alpha: 0.5),
       labelTextStyle: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.selected)) {
           return const TextStyle(fontSize: 12, fontWeight: FontWeight.w600);
@@ -79,7 +79,7 @@ class AppTheme {
     // App bar theme
     appBarTheme: AppBarTheme(
       centerTitle: true,
-      backgroundColor: primaryColor.withValues(alpha: 0.1),
+      backgroundColor: primaryColor.withValues(alpha: 0.5),
       elevation: 0,
       titleTextStyle: const TextStyle(
         color: Colors.black87,

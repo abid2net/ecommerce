@@ -1,5 +1,6 @@
 import 'package:ecommerce/common/widgets/custom_loading.dart';
 import 'package:ecommerce/screens/home/product_search_delegate.dart';
+import 'package:ecommerce/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ecommerce/blocs/product/product_bloc.dart';
@@ -7,7 +8,6 @@ import 'package:ecommerce/models/category_model.dart';
 import 'package:ecommerce/models/product_model.dart';
 import 'package:ecommerce/screens/product/product_details_screen.dart';
 import 'package:ecommerce/screens/wishlist/wishlist_screen.dart';
-import 'package:ecommerce/widgets/rating_bar.dart';
 import 'package:ecommerce/blocs/category/category_bloc.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -91,7 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           gridDelegate:
                               const SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: 2,
-                                childAspectRatio: 0.75,
+                                // childAspectRatio: 0.69,
                                 mainAxisSpacing: 8.0,
                                 crossAxisSpacing: 8.0,
                               ),
@@ -217,6 +217,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildProductCard(ProductModel product) {
     return Card(
+      margin: const EdgeInsets.all(8.0),
       child: InkWell(
         onTap: () {
           Navigator.push(
@@ -226,58 +227,78 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           );
         },
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Stack(
+          alignment: Alignment.topRight,
           children: [
-            Expanded(
-              child:
-                  product.images.isNotEmpty
-                      ? Image.network(
-                        product.images.first,
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                      )
-                      : const Icon(Icons.image, size: 100),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    product.name,
-                    style: Theme.of(context).textTheme.titleSmall,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-                  if (product.brand.isNotEmpty)
-                    Text(
-                      product.brand,
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  const SizedBox(height: 4),
-
-                  Row(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child:
+                      product.images.isNotEmpty
+                          ? Image.network(
+                            product.images.first,
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                          )
+                          : const Icon(Icons.image, size: 100),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      RatingBar(rating: product.rating, size: 14),
-                      const SizedBox(width: 4),
                       Text(
-                        '(${product.reviewCount})',
-                        style: Theme.of(context).textTheme.bodySmall,
+                        product.name,
+                        style: Theme.of(context).textTheme.titleMedium,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      if (product.brand.isNotEmpty)
+                        Text(
+                          product.brand,
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '\$${product.price.toStringAsFixed(2)}',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '\$${product.price.toStringAsFixed(2)}',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
+            if (product.rating > 0)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 5),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFD1D0D0).withValues(alpha: 0.8),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '${product.rating}',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                    const Icon(
+                      Icons.star,
+                      size: 14,
+                      color: AppTheme.quaternaryColor,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      '(${product.reviewCount})',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ],
+                ),
+              ),
           ],
         ),
       ),

@@ -4,10 +4,8 @@
 
 This project is a fully functional e-commerce application built with Flutter. It allows users to browse products, manage their cart, place orders, and manage their profiles. The application also includes features for admin users to manage products, categories, and vouchers.
 
-![Simulator Screenshot - iPhone 16 - 2025-03-03 at 14 09 15](https://github.com/user-attachments/assets/d7b4dd13-872f-46bd-89e4-c9177b54af32)
-![Simulator Screenshot - iPhone 16 - 2025-03-03 at 14 09 32](https://github.com/user-attachments/assets/9ccc857f-cf34-46b2-a0c3-f3845384d305)
-![Simulator Screenshot - iPhone 16 - 2025-03-03 at 14 10 49](https://github.com/user-attachments/assets/afdf975c-55b0-4dec-b676-50146b3a3513)
-![Simulator Screenshot - iPhone 16 - 2025-03-03 at 14 11 00](https://github.com/user-attachments/assets/eb68d516-04b1-4993-98ed-a8e7354c3030)
+![Untitled design](https://github.com/user-attachments/assets/10472dbe-c77c-49e2-9497-ae539b334e98)
+
 
 ## Features
 
